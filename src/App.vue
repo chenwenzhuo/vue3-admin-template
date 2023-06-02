@@ -4,13 +4,13 @@
         <svg>
             <use xlink:href="#icon-home"></use>
         </svg>
+        <SvgIcon name="home"/>
     </div>
 </template>
 
 <script setup lang="ts">
 
 </script>
-
 
 <style scoped>
 

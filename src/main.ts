@@ -12,6 +12,9 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'virtual:svg-icons-register'
 
+// @ts-ignore
+import SvgIcon from '@/components/SvgIcon/index.vue'
+
 const app = createApp(App)
 
 app.use(createPinia())
@@ -22,4 +25,6 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
 }
 
+//将SvgIcon注册为全局组件，可直接使用，无需在每个文件中引入
+app.component('SvgIcon', SvgIcon)
 app.mount('#app')
