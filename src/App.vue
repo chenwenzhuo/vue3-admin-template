@@ -4,7 +4,7 @@
         <svg>
             <use xlink:href="#icon-home"></use>
         </svg>
-        <SvgIcon name="home"/>
+        <SvgIcon name="home" width="50px" height="50px"/>
     </div>
 </template>
 
@@ -12,6 +12,6 @@
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 </style>
