@@ -1,9 +1,9 @@
 import {createApp} from 'vue'
-import {createPinia} from 'pinia'
 
 // @ts-ignore
 import App from './App.vue'
 import router from './router'
+import pinia from "@/stores";
 
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
@@ -19,7 +19,7 @@ import '@/styles/index.scss'
 
 const app = createApp(App)
 
-app.use(createPinia())
+app.use(pinia)
 app.use(router)
 app.use(ElementPlus, {locale: zhCn,})
 //注册所有ElementPlus图标
