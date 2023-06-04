@@ -1,6 +1,8 @@
 <template>
     <el-container class="container">
-        <el-aside class="aside">Aside</el-aside>
+        <el-aside class="aside">
+            <Logo/>
+        </el-aside>
         <el-container class="sub-container">
             <el-header class="header">Header</el-header>
             <el-main class="main">
@@ -11,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-
+import Logo from "@/components/Logo.vue";
 </script>
 
 <style scoped lang="scss">
