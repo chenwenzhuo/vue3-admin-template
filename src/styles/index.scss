@@ -1,5 +1,17 @@
 //引入reset.scss
 @import "reset";
 
-//引入自定义全局变量
-//@import "variables";
+//滚动条外观样式
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: $base-menu-background-color;
+}
+
+::-webkit-scrollbar-thumb {
+  width: 10px;
+  background-color: #36b1f5;
+  border-radius: 10px;
+}
