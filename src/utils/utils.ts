@@ -1,6 +1,6 @@
 //封装一个函数:获取一个结果:当前早上|上午|下午|晚上
 export const getTimeDesc = () => {
-    let message = ''
+    let message: string;
     //通过内置构造函数Date
     const hours = new Date().getHours()
     //情况的判断
