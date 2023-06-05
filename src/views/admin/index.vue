@@ -3,7 +3,8 @@
         <el-aside class="aside">
             <Logo/>
             <el-scrollbar class="aside-scroll-bar">
-                <el-menu background-color="#001529" text-color="#ffffff">
+                <el-menu background-color="#001529" text-color="#ffffff" active-text-color="yellowgreen"
+                         :default-active="$route.path">
                     <Menu :menuList="userStore.userState.menuRoutes[1].children"/>
                 </el-menu>
             </el-scrollbar>
@@ -18,12 +19,15 @@
 </template>
 
 <script setup lang="ts">
+import {useRoute} from "vue-router";
+
 import Logo from "@/components/Logo.vue";
 import Menu from '@/components/Menu.vue'
 import Main from '@/views/Main/index.vue'
 import {useUserStore} from "@/stores/modules/user";
 
 const userStore = useUserStore();
+const $route = useRoute();
 </script>
 
 <style scoped lang="scss">
@@ -50,13 +54,13 @@ const userStore = useUserStore();
 
     .header {
       width: 100%;
-      height: $base-tab-bar-height;
+      height: $base-top-bar-height;
       background-color: #fffc00;
     }
 
     .main {
       width: 100%;
-      height: calc(100vh - $base-tab-bar-height);
+      height: calc(100vh - $base-top-bar-height);
       background-color: #1f64cb;
       padding: 20px;
       overflow: scroll;
