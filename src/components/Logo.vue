@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="logo-container">
         <img src="@/assets/images/mall-logo.png" alt="">
         <p>商品管理运营平台</p>
     </div>
@@ -10,7 +10,7 @@
 </script>
 
 <style scoped lang="scss">
-.container {
+.logo-container {
   width: 100%;
   height: $base-menu-logo-height;
   display: flex;
