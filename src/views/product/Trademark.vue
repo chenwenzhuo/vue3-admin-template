@@ -1,11 +1,10 @@
 <template>
-    <div>首页</div>
+    <div>商品管理---Trademark</div>
 </template>
 
 <script setup lang="ts">
 
 </script>
-
 
 <style scoped lang="scss">
 

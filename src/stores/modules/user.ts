@@ -4,11 +4,13 @@ import {defineStore} from 'pinia'
 import {reqLogin} from "@/api/user";
 import type {loginForm, loginResponseData} from "@/api/user/types";
 import type {UserState} from "@/stores/modules/types";
+import {routesConfig} from "@/router/routes";
 
 //用户相关二级仓库
 export const useUserStore = defineStore('User', () => {
     let userState = reactive<UserState>({
         token: localStorage.getItem('TOKEN'),//用户唯一标识token
+        menuRoutes: routesConfig
     });
 
     async function userLogin(data: loginForm) {
