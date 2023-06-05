@@ -10,7 +10,9 @@
             </el-scrollbar>
         </el-aside>
         <el-container class="sub-container">
-            <el-header class="header">Header</el-header>
+            <el-header class="header">
+                <TopBar/>
+            </el-header>
             <el-main class="main">
                 <Main/>
             </el-main>
@@ -23,6 +25,7 @@ import {useRoute} from "vue-router";
 
 import Logo from "@/components/Logo.vue";
 import Menu from '@/components/Menu.vue'
+import TopBar from "@/components/TopBar.vue";
 import Main from '@/views/Main/index.vue'
 import {useUserStore} from "@/stores/modules/user";
 
@@ -50,12 +53,10 @@ const $route = useRoute();
 
   .sub-container {
     width: calc(100% - $base-menu-width);
-    background-color: #bfa;
 
     .header {
       width: 100%;
       height: $base-top-bar-height;
-      background-color: #fffc00;
     }
 
     .main {
