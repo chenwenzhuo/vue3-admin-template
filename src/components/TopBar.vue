@@ -14,7 +14,7 @@
         </div>
         <div class="top-bar-right">
             <el-button size="small" :icon="Refresh" circle @click="refreshPage"/>
-            <el-button size="small" :icon="FullScreen" circle/>
+            <el-button size="small" :icon="FullScreen" circle @click="fullScreen"/>
             <el-button size="small" :icon="Setting" circle/>
             <!--用户名下拉菜单-->
             <el-dropdown class="user-drop-down">
@@ -45,6 +45,19 @@ const settingsStore = useSysSettingsStore();
 
 //刷新页面
 const refreshPage = () => settingsStore.doRefresh();
+
+//切换全屏模式
+const fullScreen = () => {
+    //DOM对象的属性，判断当前是否是全屏模式
+    //全屏：true，非全屏：null
+    let isFull = document.fullscreenElement;
+    //切换全屏
+    if (!isFull) {
+        document.documentElement.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+}
 </script>
 
 <style scoped lang="scss">
