@@ -42,5 +42,14 @@ export const useUserStore = defineStore('User', () => {
         }
     }
 
-    return {userState, userLogin, userInfo}
+    //退出登录
+    function userLogout() {
+        userState.token = '';
+        userState.username = '';
+        userState.avatar = '';
+        //清除localStorage中Token
+        localStorage.removeItem('TOKEN');
+    }
+
+    return {userState, userLogin, userInfo, userLogout}
 });

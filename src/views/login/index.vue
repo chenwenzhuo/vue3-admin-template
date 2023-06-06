@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import {reactive, ref} from "vue";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {ElNotification} from "element-plus";
 import type {FormRules, FormInstance} from "element-plus";
 
@@ -41,6 +41,7 @@ const loginFormRef = ref<FormInstance>();
 const loginFormData = reactive({username: '', password: ''});
 let loading = ref<boolean>(false);//控制按钮加载效果
 const userStore = useUserStore();
+const $route = useRoute();
 const $router = useRouter();
 
 //表单校验规则
@@ -67,7 +68,13 @@ const login = () => {
         //请求失败->弹出提示信息
         userStore.userLogin(loginFormData).then(result => {
             loading.value = false;//取消加载效果
-            $router.push('/');//跳转到首页
+            //检查是否有query参数
+            const redirect = $route.query.redirect;
+            if (redirect) {
+                $router.replace(redirect);//跳转到退出登录前页面
+            } else {
+                $router.push('/');//跳转到首页
+            }
             ElNotification({
                 type: 'success',
                 title: `${getTimeDesc()}好`,
