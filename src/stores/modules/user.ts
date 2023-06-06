@@ -1,7 +1,7 @@
 import {reactive} from 'vue'
 import {defineStore} from 'pinia'
 
-import {reqLogin} from "@/api/user";
+import {reqLogin, reqUserInfo} from "@/api/user";
 import type {loginForm, loginResponseData} from "@/api/user/types";
 import type {UserState} from "@/stores/modules/types";
 import {routesConfig} from "@/router/routes";
@@ -10,7 +10,9 @@ import {routesConfig} from "@/router/routes";
 export const useUserStore = defineStore('User', () => {
     let userState = reactive<UserState>({
         token: localStorage.getItem('TOKEN'),//用户唯一标识token
-        menuRoutes: routesConfig
+        menuRoutes: routesConfig,
+        username: '',
+        avatar: ''
     });
 
     async function userLogin(data: loginForm) {
@@ -31,5 +33,14 @@ export const useUserStore = defineStore('User', () => {
         }
     }
 
-    return {userState, userLogin}
+    //获取用户信息并存储
+    async function userInfo() {
+        const result: any = await reqUserInfo();
+        if (result.code === 200) {
+            userState.username = result.data.checkUser.username;
+            userState.avatar = result.data.checkUser.avatar;
+        }
+    }
+
+    return {userState, userLogin, userInfo}
 });
