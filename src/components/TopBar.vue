@@ -16,7 +16,7 @@
             <el-button size="small" :icon="Refresh" circle @click="refreshPage"/>
             <el-button size="small" :icon="FullScreen" circle @click="fullScreen"/>
             <el-button size="small" :icon="Setting" circle/>
-            <img :src="userStore.userState.avatar"/>
+            <img :src="userStore.userState.avatar" :alt="userStore.userState.username"/>
             <!--用户名下拉菜单-->
             <el-dropdown class="user-drop-down">
                 <span class="el-dropdown-link">
