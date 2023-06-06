@@ -16,9 +16,9 @@ export const routesConfig = [{
     name: 'admin',
     redirect: '/home',
     meta: {
-        title: 'admin',
+        title: '',
         hidden: false,
-        icon: 'Avatar'
+        icon: ''
     },
     children: [{
         path: '/home',
@@ -47,6 +47,7 @@ export const routesConfig = [{
             hidden: false,
             icon: 'Lock'
         },
+        redirect: '/acl/user',
         children: [{
             path: '/acl/user',
             component: import((`@/views/acl/User.vue`)),
@@ -84,6 +85,7 @@ export const routesConfig = [{
             hidden: false,
             icon: 'Goods',
         },
+        redirect: '/product/trademark',
         children: [{
             path: '/product/trademark',
             component: import((`@/views/product/Trademark.vue`)),
