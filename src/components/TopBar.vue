@@ -13,7 +13,7 @@
             </el-breadcrumb>
         </div>
         <div class="top-bar-right">
-            <el-button size="small" :icon="Refresh" circle/>
+            <el-button size="small" :icon="Refresh" circle @click="refreshPage"/>
             <el-button size="small" :icon="FullScreen" circle/>
             <el-button size="small" :icon="Setting" circle/>
             <!--用户名下拉菜单-->
@@ -38,7 +38,13 @@ import {
     ArrowRight, FullScreen, Refresh, Setting
 } from "@element-plus/icons-vue";
 
+import {useSysSettingsStore} from "@/stores/modules/settings";
+
 const $route = useRoute();
+const settingsStore = useSysSettingsStore();
+
+//刷新页面
+const refreshPage = () => settingsStore.doRefresh();
 </script>
 
 <style scoped lang="scss">

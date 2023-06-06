@@ -26,7 +26,7 @@ import {useRoute} from "vue-router";
 import Logo from "@/components/Logo.vue";
 import Menu from '@/components/Menu.vue'
 import TopBar from "@/components/TopBar.vue";
-import Main from '@/views/Main/index.vue'
+import Main from '@/views/main/index.vue'
 import {useUserStore} from "@/stores/modules/user";
 
 const userStore = useUserStore();
