@@ -39,6 +39,10 @@ export const useUserStore = defineStore('User', () => {
         if (result.code === 200) {
             userState.username = result.data.checkUser.username;
             userState.avatar = result.data.checkUser.avatar;
+            return 'ok';
+        } else {
+            //返回一个失败的Promise
+            return Promise.reject(new Error('获取用户信息失败'));
         }
     }
 
