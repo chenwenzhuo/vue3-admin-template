@@ -3,9 +3,12 @@
         <div class="top-bar-left">
             <!--TopBar左侧面包屑-->
             <el-breadcrumb :separator-icon="ArrowRight">
-                <el-breadcrumb-item :to="{ path: '/' }">homepage</el-breadcrumb-item>
-                <el-breadcrumb-item>
-                    <a href="/">promotion management</a>
+                <el-breadcrumb-item v-for="(item,index) in $route.matched" :key="index"
+                                    v-show="item.meta.title">
+                    <el-icon style="margin-right: 5px">
+                        <component :is="item.meta.icon"/>
+                    </el-icon>
+                    <span>{{ item.meta.title }}</span>
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -30,9 +33,12 @@
 </template>
 
 <script setup lang="ts">
+import {useRoute} from "vue-router";
 import {
     ArrowRight, FullScreen, Refresh, Setting
 } from "@element-plus/icons-vue";
+
+const $route = useRoute();
 </script>
 
 <style scoped lang="scss">
