@@ -16,10 +16,11 @@
             <el-button size="small" :icon="Refresh" circle @click="refreshPage"/>
             <el-button size="small" :icon="FullScreen" circle @click="fullScreen"/>
             <el-button size="small" :icon="Setting" circle/>
+            <img :src="userStore.userState.avatar"/>
             <!--用户名下拉菜单-->
             <el-dropdown class="user-drop-down">
                 <span class="el-dropdown-link">
-                  <span>admin</span>
+                  <span>{{ userStore.userState.username }}</span>
                     <el-icon><ArrowDown/></el-icon>
                 </span>
                 <template #dropdown>
@@ -38,9 +39,11 @@ import {
     ArrowRight, FullScreen, Refresh, Setting
 } from "@element-plus/icons-vue";
 
+import {useUserStore} from "@/stores/modules/user";
 import {useSysSettingsStore} from "@/stores/modules/settings";
 
 const $route = useRoute();
+const userStore = useUserStore();
 const settingsStore = useSysSettingsStore();
 
 //刷新页面
@@ -73,6 +76,13 @@ const fullScreen = () => {
   .top-bar-right {
     display: flex;
     align-items: center;
+
+    img {
+      width: 30px;
+      height: 30px;
+      margin-left: 10px;
+      border-radius: 50%;
+    }
 
     .user-drop-down {
       margin-left: 10px;
