@@ -38,7 +38,7 @@ import {useUserStore} from "@/stores/modules/user";
 import {getTimeDesc} from "@/utils/utils";
 
 const loginFormRef = ref<FormInstance>();
-const loginFormData = reactive({username: '', password: ''});
+const loginFormData = reactive({username: 'admin', password: 'atguigu123'});
 let loading = ref<boolean>(false);//控制按钮加载效果
 const userStore = useUserStore();
 const $route = useRoute();

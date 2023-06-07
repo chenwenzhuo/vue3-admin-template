@@ -62,7 +62,6 @@ router.beforeEach(async (to: any, from: any, next: any) => {
                 next({path: "/login", query: {redirect: to.path}});
             }
         }
-        next();
     } else {//未登录
         if (to.path === '/login') {
             next();//访问登录页，直接放行

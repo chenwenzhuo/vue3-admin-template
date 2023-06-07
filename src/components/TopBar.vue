@@ -63,11 +63,11 @@ const fullScreen = () => {
     }
 }
 
-const logout = () => {
+const logout = async () => {
     //1.调用退出登录接口，告知服务器
     //2.清空仓库中相关数据
     //3.跳转登录界面
-    userStore.userLogout();
+    await userStore.userLogout();
     $router.replace({path: '/login', query: {redirect: $route.path}});
 }
 </script>
