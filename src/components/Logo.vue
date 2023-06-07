@@ -17,6 +17,7 @@
   justify-content: center;
   align-items: center;
   border-bottom: 1px solid #989898;
+  box-sizing: border-box;
 
   img {
     width: 60px;

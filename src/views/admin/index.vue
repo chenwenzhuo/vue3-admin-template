@@ -62,7 +62,6 @@ const $route = useRoute();
     .main {
       width: 100%;
       height: calc(100vh - $base-top-bar-height);
-      background-color: #1f64cb;
       padding: 20px;
       overflow: scroll;
     }
