@@ -159,7 +159,6 @@ const handleUpdateTrademark = (row: Trademark | undefined) => {
 //发送添加/修改请求
 const sendAddOrUpdateRequest = async (operation: string) => {
     let result: any = await reqAddOrUpdateTrademark(trademarkParams);
-    console.log('add update result------', result);
     if (result.code === 200) {
         ElMessage.success(`${operation}品牌成功！`);
         closeDialog();//关闭对话框

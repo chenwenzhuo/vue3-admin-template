@@ -17,7 +17,6 @@ export const useUserStore = defineStore('User', () => {
 
     async function userLogin(data: loginFormData) {
         const result: loginResponseData = await reqLogin(data);
-        console.log('login result---------', result);
         //登录成功：200->token
         //登录失败：201->错误信息
         if (result.code === 200) {
@@ -36,7 +35,6 @@ export const useUserStore = defineStore('User', () => {
     //获取用户信息并存储
     async function userInfo() {
         const result: userInfoResponseData = await reqUserInfo();
-        console.log('userInfo result---------', result);
         if (result.code === 200) {
             userState.username = result.data.name;
             userState.avatar = result.data.avatar;
@@ -50,7 +48,6 @@ export const useUserStore = defineStore('User', () => {
     //退出登录
     async function userLogout() {
         const result: any = await reqLogout();
-        console.log('userLogout result---------', result);
         if (result.code === 200) {
             userState.token = '';
             userState.username = '';

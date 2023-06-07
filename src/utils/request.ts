@@ -16,7 +16,6 @@ request.interceptors.request.use(config => {
     //发送请求时携带用户token
     if (userStore.userState.token) {
         config.headers.token = userStore.userState.token;
-        console.log('token--------', userStore.userState.token);
     }
     return config;
 });
