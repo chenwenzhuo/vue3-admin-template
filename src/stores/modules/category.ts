@@ -41,6 +41,17 @@ export const useCategoryStore = defineStore('Category', () => {
             result.data.forEach((item: any) => c3Data.push(item));
         }
     }
+
+    //重置仓库数据
+    const resetCategory = () => {
+        c1Data.length = 0;
+        c1Id.value = '';
+        c2Data.length = 0;
+        c2Id.value = '';
+        c3Data.length = 0;
+        c3Id.value = '';
+    }
+
     watch(() => c1Id.value, () => {//一级分类选中项发生变化时
         //清空二级、三级分类数据
         c2Data.length = 0;
@@ -60,6 +71,6 @@ export const useCategoryStore = defineStore('Category', () => {
 
     return {
         c1Data, c1Id, c2Data, c2Id, c3Data, c3Id,
-        reqCategory1, reqCategory2, reqCategory3
+        reqCategory1, reqCategory2, reqCategory3, resetCategory
     }
 });

@@ -95,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, nextTick, reactive, ref, watch} from "vue";
+import {computed, nextTick, onBeforeUnmount, reactive, ref, watch} from "vue";
 import {ElMessage} from "element-plus";
 import {Plus} from "@element-plus/icons-vue";
 
@@ -244,6 +244,9 @@ const cancelAttrEdit = () => {
     scene.value = !scene.value;//返回属性展示界面
     addOrUpdateFlag.value = 0;//重置标志位
 }
+
+//组件卸载前清除pinia仓库数据
+onBeforeUnmount(() => categoryStore.resetCategory());
 </script>
 
 <style scoped lang="scss">
