@@ -85,7 +85,10 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <el-button type="primary" :disabled="attrParams.attrName===''" @click="saveAttr">保存</el-button>
+            <el-button type="primary" @click="saveAttr"
+                       :disabled="attrParams.attrName===''||attrParams.attrValueList.length===0">
+                保存
+            </el-button>
             <el-button type="primary" @click="cancelAttrEdit">取消</el-button>
         </div>
     </el-card>
