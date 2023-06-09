@@ -49,7 +49,7 @@
             </el-form>
 
             <el-button type="primary" :icon="Plus" @click="handleAddAttrValue"
-                       :disabled="attrParams.attrName===''">
+                       :disabled="!attrParams.attrName">
                 添加属性值
             </el-button>
 
@@ -86,7 +86,7 @@
                 </el-table-column>
             </el-table>
             <el-button type="primary" @click="saveAttr"
-                       :disabled="attrParams.attrName===''||attrParams.attrValueList.length===0">
+                       :disabled="!attrParams.attrName||!attrParams.attrValueList.length">
                 保存
             </el-button>
             <el-button type="primary" @click="cancelAttrEdit">取消</el-button>
