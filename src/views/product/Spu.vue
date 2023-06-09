@@ -1,11 +1,120 @@
 <template>
-    <div>商品管理---Spu</div>
+    <CategorySelect :selector-enabled="scene===0"/>
+
+    <el-card class="box-card">
+        <!--展示SPU信息-->
+        <div v-show="scene===0">
+            <el-button type="primary" icon="Plus" class="add-spu"
+                       @click="handleAddSPU">
+                添加SPU
+            </el-button>
+
+            <el-table :data="SPUTableData" border :header-cell-style="{'textAlign':'center'}">
+                <el-table-column type="index" label="序号" width="80" align="center"/>
+                <el-table-column prop="spuName" label="SPU名称"/>
+                <el-table-column prop="description" label="SPU描述"/>
+                <el-table-column label="SPU操作" width="240" align="center">
+                    <template #default="{row}">
+                        <el-button type="primary" icon="Plus" size="small">添加</el-button>
+                        <el-button type="primary" icon="Edit" size="small"
+                                   @click="handleUpdateSPU(row)">
+                            编辑
+                        </el-button>
+                        <div style="margin: 3px 0"></div>
+                        <el-button type="primary" icon="View" size="small">查看</el-button>
+                        <el-button type="danger" icon="Delete" size="small">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination background layout="->,prev,pager,next,total,sizes,jumper"
+                           :total="total" :page-sizes="[5,10,20]" :pager-count="5"
+                           v-model:current-page="pageNo" v-model:page-size="limit"
+                           @current-change="getExistingSPU" @size-change="handlePageSizeChange"/>
+        </div>
+
+        <!--添加、修改SPU-->
+        <SpuForm ref="spuFormRef" v-show="scene===1" @changeScene="changeScene"/>
+
+        <!--添加SKU的结构-->
+        <SkuForm ref="skuFormRef" v-show="scene===2" @changeScene="changeScene"/>
+    </el-card>
 </template>
 
 <script setup lang="ts">
+import {reactive, ref, watch} from "vue";
 
+import CategorySelect from "@/components/CategorySelect.vue";
+import SpuForm from "@/views/product/SpuForm.vue";
+import SkuForm from "@/views/product/SkuForm.vue";
+import {useCategoryStore} from "@/stores/modules/category";
+import type {
+    ExistingSPUResponseData, Records, SPUData
+} from "@/api/product/spu/types";
+import {reqExistingSPU} from "@/api/product/spu";
+
+const categoryStore = useCategoryStore();
+let pageNo = ref<number>(1);//表格当前页码
+let limit = ref<number>(10);//表格每页数据条数
+let total = ref<number>(0);//表格总数据条数
+const SPUTableData = reactive<Records>([]);//SPU表格数据
+
+//控制页面场景切换。0:显示已有SPU，1:添加或者修改已有SPU，2:添加SKU的结构
+let scene = ref<number>(0);
+const spuFormRef = ref<any>();//子组件SpuForm实例
+const skuFormRef = ref<any>();//子组件SkuForm实例
+
+//监听仓库中三级分类id，有值时查询SPU数据
+watch(() => categoryStore.c3Id, () => {
+    if (!categoryStore.c3Id) {
+        //id为空，清空数据，不进行查询
+        SPUTableData.length = 0;
+        return;
+    }
+    getExistingSPU();
+});
+
+//发送请求查询SPU数据
+const getExistingSPU = async () => {
+    const result: ExistingSPUResponseData = await reqExistingSPU(pageNo.value, limit.value, categoryStore.c3Id);
+    if (result.code === 200) {
+        SPUTableData.length = 0;//清空已有数据
+        result.data.records.forEach(item => SPUTableData.push(item));
+        total.value = result.data.total;
+    }
+}
+
+//分页器页大小变化的回调
+const handlePageSizeChange = () => {
+    pageNo.value = 1;
+    getExistingSPU();
+}
+
+//添加SPU的回调
+const handleAddSPU = () => {
+    scene.value = 1;//切换到添加页面
+}
+
+//修改SPU的点击回调
+const handleUpdateSPU = (row: SPUData) => {
+    scene.value = 1;//切换到添加页面
+    //调用子组件方法，初始化数据
+    spuFormRef.value.initSPUData(row);
+}
+
+//切换场景，传递给子组件使用
+const changeScene = (obj: any) => {
+    scene.value = obj.scene;
+}
 </script>
 
 <style scoped lang="scss">
+.box-card {
+  .add-spu {
+    margin-bottom: 15px;
+  }
 
+  .el-pagination {
+    margin-top: 15px
+  }
+}
 </style>
