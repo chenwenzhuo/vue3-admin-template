@@ -77,7 +77,7 @@
         </el-form-item>
         <el-form-item style="margin-top: 20px">
             <el-button type="primary" @click="saveSPU">保存</el-button>
-            <el-button @click="handleCancel">取消</el-button>
+            <el-button @click="handleCancel('cancel')">取消</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -127,7 +127,7 @@ let saleAttrToSelect = computed(() => {
 let spuParams = reactive<SPUParamsType>({
     data: {}
 });
-const picCardFileList = reactive([]);//照片墙文件列表
+let picCardFileList = reactive<any>([]);//照片墙文件列表
 let picCardPreview = ref<boolean>(false);//照片墙预览对话框是否展示
 let picCardPreviewUrl = ref<string>('');//照片墙预览图片url
 
@@ -159,7 +159,6 @@ const imgUploadSuccess = (response, uploadFile) => {
 
 //照片墙删除文件回调
 const handlePicCardRemove = (uploadFile, uploadFiles) => {
-    console.log('handlePicCardRemove-----------', uploadFile, uploadFiles);
     //picCardFileList中数据会自动删除，手动删除spuImageList中对应数据
     //寻找待删除数据在spuImageList中的下标
     let targetIndex = -1;
@@ -232,11 +231,10 @@ const saveSPU = async () => {
     spuParams.data.spuSaleAttrList = [...existingSPUSaleAttr];
     //发送请求
     const result = await reqAddOrUpdateSPU(spuParams.data);
-    console.log('saveSPU result-------', result);
     if (result.code === 200) {
         ElMessage.success(`${spuParams.data.id ? '更新' : '新增'}成功！`);
         //返回主页
-        handleCancel();
+        handleCancel(spuParams.data.id ? 'update' : 'add');
     } else {
         ElMessage.error(`${spuParams.data.id ? '更新' : '新增'}失败！${result.data}`);
     }
@@ -272,9 +270,26 @@ const initSPUData = async (spu: SPUData) => {
     }
 }
 
+//添加SPU时的初始化数据请求
+const initSPUData_Add = async (c3Id: number | string) => {
+    spuParams.data.category3Id = c3Id;
+
+    const results: (AllTrademarkResponseData | SaleAttrResponseData) =
+        await Promise.all([reqAllTrademark(), reqAllSaleAttr()]);
+    //保存数据
+    if (results[0].code === 200) {
+        allTrademarks.length = 0;
+        results[0].data.forEach(item => allTrademarks.push(item));
+    }
+    if (results[1].code === 200) {
+        allSaleAttr.length = 0;
+        results[1].data.forEach(item => allSaleAttr.push(item));
+    }
+}
+
 //取消按钮点击回调
-const handleCancel = () => {
-    $emits('changeScene', {scene: 0});
+const handleCancel = (param: string) => {
+    $emits('changeScene', {scene: 0, param: param});
     //清除SPU数据
     allTrademarks.length = 0;
     spuImageList.length = 0;
@@ -282,10 +297,11 @@ const handleCancel = () => {
     allSaleAttr.length = 0;
     spuParams.data = {};
     picCardFileList.length = 0;
+    saleAttrIdAndValueName.value = '';
 }
 
 //对外暴露组件方法
-defineExpose({initSPUData});
+defineExpose({initSPUData, initSPUData_Add});
 </script>
 
 <style scoped lang="scss">

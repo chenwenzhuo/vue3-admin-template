@@ -92,6 +92,7 @@ const handlePageSizeChange = () => {
 //添加SPU的回调
 const handleAddSPU = () => {
     scene.value = 1;//切换到添加页面
+    spuFormRef.value.initSPUData_Add(categoryStore.c3Id);
 }
 
 //修改SPU的点击回调
@@ -104,6 +105,15 @@ const handleUpdateSPU = (row: SPUData) => {
 //切换场景，传递给子组件使用
 const changeScene = (obj: any) => {
     scene.value = obj.scene;
+    //重新查询SPU表格数据
+    if (obj.param === 'update') {
+        //执行完更新SPU业务，回到展示界面，则表格停留在当前页
+        getExistingSPU();
+    } else if (obj.param === 'add') {
+        //执行完新增SPU业务，回到展示界面，则表格回到第一页
+        pageNo.value = 1;
+        getExistingSPU();
+    }
 }
 </script>
 
