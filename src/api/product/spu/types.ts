@@ -83,7 +83,7 @@ export interface SaleAttr {
     baseSaleAttrId: number | string,
     saleAttrName: string,
     spuSaleAttrValueList: SpuSaleAttrValueList
-    flag?: boolean,
+    editFlag?: boolean,
     saleAttrValue?: string,
 }
 

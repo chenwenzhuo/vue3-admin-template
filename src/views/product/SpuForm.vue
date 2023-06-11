@@ -32,11 +32,16 @@
             </el-dialog>
         </el-form-item>
         <el-form-item label="SPU销售属性">
-            <el-select :placeholder="`剩余${saleAttrToSelect.length}个属性待选择`">
+            <!--SPU销售属性下拉框需要收集属性id和属性名，将两属性以json字符串形式返回，作为下拉框的value-->
+            <el-select :placeholder="`剩余${saleAttrToSelect.length}个属性待选择`"
+                       v-model="saleAttrIdAndValueName" clearable>
                 <el-option v-for="item in saleAttrToSelect" :key="item.id"
-                           :label="item.name" :value="item.id"/>
+                           :label="item.name" :value="JSON.stringify({id:item.id, name:item.name})"/>
             </el-select>
-            <el-button type="primary" icon="Plus" style="margin-left: 15px">
+            <!--仅当下拉框有选择时启用按钮-->
+            <el-button type="primary" icon="Plus" style="margin-left: 15px"
+                       :disabled="!saleAttrIdAndValueName"
+                       @click="addSaleAttr">
                 添加属性
             </el-button>
             <el-table border :header-cell-style="{'textAlign':'center'}" style="margin-top: 15px"
@@ -44,18 +49,26 @@
                 <el-table-column type="index" label="序号" width="80" align="center"/>
                 <el-table-column prop="saleAttrName" label="销售属性名字" width="150" align="center"/>
                 <el-table-column label="销售属性值">
-                    <template #default="{row}">
-                        <el-tag v-for="item in row.spuSaleAttrValueList"
-                                :key="item.id" style="margin-right: 6px">
+                    <template #default="{row,$index}">
+                        <!--点击关闭tag时，将对应数据从数组中移除-->
+                        <el-tag v-for="(item,index) in row.spuSaleAttrValueList"
+                                :key="item.id" style="margin: 5px" closable
+                                @close="()=>row.spuSaleAttrValueList.splice(index,1)">
                             {{ item.saleAttrValueName }}
                         </el-tag>
-                        <el-button type="primary" size="small" icon="Plus"/>
+                        <!--销售属性值输入框和新增按钮，默认显示按钮，点击按钮显示输入框，完成输入后输入框隐藏，重新显示按钮-->
+                        <el-input :ref="(vc:any)=>saleAttrValueInputs[$index]=vc"
+                                  size="small" style="width: 120px"
+                                  v-model="row.saleAttrValue" v-show="row.editFlag"
+                                  @blur="saleAttrValueInputBlur(row)"/>
+                        <el-button type="primary" size="small" icon="Plus"
+                                   v-show="!row.editFlag" @click="addSaleAttrValue(row,$index)"/>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="100" align="center">
                     <template #default="{$index}">
                         <el-button type="danger" icon="Delete"
-                                   @close="()=>existingSPUSaleAttr.splice($index,1)">
+                                   @click="()=>existingSPUSaleAttr.splice($index,1)">
                             删除
                         </el-button>
                     </template>
@@ -63,7 +76,7 @@
             </el-table>
         </el-form-item>
         <el-form-item style="margin-top: 20px">
-            <el-button type="primary">保存</el-button>
+            <el-button type="primary" @click="saveSPU">保存</el-button>
             <el-button @click="handleCancel">取消</el-button>
         </el-form-item>
     </el-form>
@@ -78,9 +91,10 @@ import type {
     SaleAttrResponseData,
     ExistingSaleAttrResponseData,
     SPUData, Trademark, SPUImage,
-    SaleAttr, ExistingSaleAttr,
+    SaleAttr, ExistingSaleAttr, SaleAttrValue,
 } from "@/api/product/spu/types";
 import {
+    reqAddOrUpdateSPU,
     reqAllSaleAttr, reqAllTrademark,
     reqExistingSPUSaleAttr, reqSPUImageList
 } from "@/api/product/spu";
@@ -116,6 +130,9 @@ let spuParams = reactive<SPUParamsType>({
 const picCardFileList = reactive([]);//照片墙文件列表
 let picCardPreview = ref<boolean>(false);//照片墙预览对话框是否展示
 let picCardPreviewUrl = ref<string>('');//照片墙预览图片url
+
+let saleAttrIdAndValueName = ref<string>('');//SPU销售属性下拉框被选择项的值
+let saleAttrValueInputs = reactive<any>([]);//SPU销售属性表格中，属性值input组件ref数组
 
 //照片墙文件上传前回调
 const beforeImgUpload: UploadProps['beforeUpload'] = rawFile => {
@@ -164,6 +181,65 @@ const handlePicCardPreview = (file: any) => {
 const handlePicCardPreviewClose = () => {
     picCardPreview.value = false;
     picCardPreviewUrl.value = '';
+}
+
+//SPU销售属性-添加属性按钮点击回调
+const addSaleAttr = () => {
+    //将属性id和属性名的json字符串转为json对象
+    const obj = JSON.parse(saleAttrIdAndValueName.value);
+    //向表格数据中追加一条，对应表格中增加一行
+    const attrObj: SaleAttr = {
+        baseSaleAttrId: obj.id,
+        saleAttrName: obj.name,
+        spuSaleAttrValueList: []
+    };
+    existingSPUSaleAttr.push(attrObj);
+    //清空数据
+    saleAttrIdAndValueName.value = '';
+}
+
+//SPU销售属性-表格“销售属性值”列中添加属性值按钮的点击回调
+const addSaleAttrValue = (row: SaleAttr, $index: number) => {
+    row.editFlag = true;//切换到编辑属性值模式
+    saleAttrValueInputs[$index].focus();//输入框自动获取焦点
+}
+
+//SPU销售属性-表格“销售属性值”列中input输入框的blur事件回调
+const saleAttrValueInputBlur = (row: SaleAttr) => {
+    //属性值不能重复
+    const repeat = row.spuSaleAttrValueList.find(item => item.saleAttrValueName === row.saleAttrValue);
+    if (repeat) {
+        ElMessage.error('属性值不能重复！');
+    } else if (!row.saleAttrValue || row.saleAttrValue.trim() === '') {
+        ElMessage.error('属性值不能为空！');
+    } else {
+        //属性值合法，加入list
+        const obj: SaleAttrValue = {
+            baseSaleAttrId: row.baseSaleAttrId,
+            saleAttrValueName: row.saleAttrValue
+        };
+        row.spuSaleAttrValueList.push(obj);
+    }
+    //退出编辑模式
+    row.editFlag = false;
+    row.saleAttrValue = '';
+}
+
+//保存按钮点击回调
+const saveSPU = async () => {
+    //整理参数（照片墙、销售属性）
+    spuParams.data.spuImageList = [...spuImageList];
+    spuParams.data.spuSaleAttrList = [...existingSPUSaleAttr];
+    //发送请求
+    const result = await reqAddOrUpdateSPU(spuParams.data);
+    console.log('saveSPU result-------', result);
+    if (result.code === 200) {
+        ElMessage.success(`${spuParams.data.id ? '更新' : '新增'}成功！`);
+        //返回主页
+        handleCancel();
+    } else {
+        ElMessage.error(`${spuParams.data.id ? '更新' : '新增'}失败！${result.data}`);
+    }
 }
 
 //初始化SPU数据

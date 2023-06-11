@@ -13,7 +13,7 @@ enum API {
     EXISTING_SPU_SALE_ATTR_URL = '/admin/product/spuSaleAttrList',//获取某个SPU下所有销售属性
     ALL_SALE_ATTR_URL = '/admin/product/baseSaleAttrList',//获取整个项目全部的销售属性[颜色、版本、尺码]
     ADD_SPU_URL = '/admin/product/saveSpuInfo',//添加新的SPU
-    UPDATE_SPU_URL = '/admin/product/saveSpuInfo',//更新已有SPU
+    UPDATE_SPU_URL = '/admin/product/updateSpuInfo',//更新已有SPU
 }
 
 //获取已有SPU
