@@ -85,6 +85,7 @@ export interface SaleAttr {
     spuSaleAttrValueList: SpuSaleAttrValueList
     editFlag?: boolean,
     saleAttrValue?: string,
+    saleIdAndValueId?: string,//添加sku时，收集属性id与属性值id表单项数据
 }
 
 //属性查询接口返回的数据类型
@@ -100,4 +101,24 @@ export interface ExistingSaleAttr {
 
 export interface ExistingSaleAttrResponseData extends ResponseData {
     data: ExistingSaleAttr[]
+}
+
+//添加SKU时，请求数据类型
+export interface SKUData {
+    category3id: number | string,
+    spuId: number | string,
+    tmId: number | string,
+    skuName: string,
+    price: number | string,
+    weight: number | string,
+    skuDesc: string,
+    skuDefaultImg: string,
+    skuAttrValueList: [{
+        attrId: number | string,
+        valueId: number | string
+    }],
+    skuSaleAttrValueList: [{
+        saleAttrId: number | string,
+        saleAttrValueId: number | string
+    }]
 }

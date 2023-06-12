@@ -3,7 +3,7 @@ import request from "@/utils/request";
 import type {
     AllTrademarkResponseData, ExistingSaleAttrResponseData,
     ExistingSPUResponseData, ImageListResponseData,
-    SaleAttrResponseData, SPUData
+    SaleAttrResponseData, SKUData, SPUData
 } from "@/api/product/spu/types";
 
 enum API {
@@ -14,6 +14,7 @@ enum API {
     ALL_SALE_ATTR_URL = '/admin/product/baseSaleAttrList',//获取整个项目全部的销售属性[颜色、版本、尺码]
     ADD_SPU_URL = '/admin/product/saveSpuInfo',//添加新的SPU
     UPDATE_SPU_URL = '/admin/product/updateSpuInfo',//更新已有SPU
+    ADD_SKU_URL = '/admin/product/saveSkuInfo',//新增一个SKU
 }
 
 //获取已有SPU
@@ -41,3 +42,6 @@ export const reqAddOrUpdateSPU = (data: SPUData) => {
         return request.post<any, any>(API.ADD_SPU_URL, data);
     }
 }
+
+//新增一个SKU
+export const reqAddSKU = (data: SKUData) => request.post<any, any>(API.ADD_SKU_URL, data);

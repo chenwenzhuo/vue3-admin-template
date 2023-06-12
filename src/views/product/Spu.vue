@@ -15,7 +15,10 @@
                 <el-table-column prop="description" label="SPU描述"/>
                 <el-table-column label="SPU操作" width="240" align="center">
                     <template #default="{row}">
-                        <el-button type="primary" icon="Plus" size="small">添加</el-button>
+                        <el-button type="primary" icon="Plus" size="small"
+                                   @click="handleAddSKU(row)">
+                            添加
+                        </el-button>
                         <el-button type="primary" icon="Edit" size="small"
                                    @click="handleUpdateSPU(row)">
                             编辑
@@ -95,9 +98,20 @@ const handleAddSPU = () => {
     spuFormRef.value.initSPUData_Add(categoryStore.c3Id);
 }
 
+//添加SKU的点击回调
+const handleAddSKU = (row: SPUData) => {
+    scene.value = 2;//切换到添加SKU页面
+    skuFormRef.value.initSKUData({
+        c1Id: categoryStore.c1Id,
+        c2Id: categoryStore.c2Id,
+        c3Id: categoryStore.c3Id,
+        spu: row
+    });
+}
+
 //修改SPU的点击回调
 const handleUpdateSPU = (row: SPUData) => {
-    scene.value = 1;//切换到添加页面
+    scene.value = 1;//切换到添加/修改页面
     //调用子组件方法，初始化数据
     spuFormRef.value.initSPUData(row);
 }

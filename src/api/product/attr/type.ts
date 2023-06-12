@@ -38,7 +38,8 @@ export interface AttrObj {
     attrName: string,
     categoryId: number | string,
     categoryLevel: number,
-    attrValueList: AttrValueList
+    attrValueList: AttrValueList,
+    attrIdAndValueId?: string//SPU管理页面，添加sku时，收集属性id与属性值id表单项数据
 }
 
 //属性对象数组
