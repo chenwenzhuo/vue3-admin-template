@@ -103,7 +103,7 @@ import CategorySelect from "@/components/CategorySelect.vue";
 import {useCategoryStore} from "@/stores/modules/category";
 import type {
     AttrObj, AttrObjList, AttrResponseData, AttrValue
-} from "@/api/product/attr/type";
+} from "@/api/product/attr/types";
 import {reqAddOrUpdateAttr, reqAttrs, reqDeleteAttr} from "@/api/product/attr";
 
 const categoryStore = useCategoryStore();//分类数据仓库

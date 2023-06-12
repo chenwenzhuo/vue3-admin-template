@@ -66,7 +66,7 @@
 import {reactive, ref} from "vue";
 import {ElMessage, ElTable} from "element-plus";
 
-import {AttrObjList, AttrResponseData} from "@/api/product/attr/type";
+import {AttrObjList, AttrResponseData} from "@/api/product/attr/types";
 import {ImageListResponseData, SaleAttr, SaleAttrResponseData, SKUData, SPUImage} from "@/api/product/spu/types";
 import {reqAttrs} from "@/api/product/attr";
 import {reqAddSKU, reqExistingSPUSaleAttr, reqSPUImageList} from "@/api/product/spu";

@@ -1,6 +1,6 @@
 //属性管理相关API
 import request from "@/utils/request";
-import type {AttrObj, AttrResponseData, CategoryResponseData} from "@/api/product/attr/type";
+import type {AttrObj, AttrResponseData, CategoryResponseData} from "@/api/product/attr/types";
 
 //属性管理相关请求URL
 enum API {

@@ -3,7 +3,7 @@ import {reactive, ref, watch} from "vue";
 import {defineStore} from "pinia";
 
 import {reqC1, reqC2, reqC3} from "@/api/product/attr";
-import type {CategoryObj, CategoryResponseData} from "@/api/product/attr/type";
+import type {CategoryObj, CategoryResponseData} from "@/api/product/attr/types";
 
 export const useCategoryStore = defineStore('Category', () => {
     const c1Data = reactive<CategoryObj[]>([]);//一级分类选项数组
