@@ -23,7 +23,12 @@
                                @click="showSKUDetail(row)">
                         详情
                     </el-button>
-                    <el-button type="danger" icon="Delete" size="small">删除</el-button>
+                    <el-popconfirm title="是否确认删除此商品？" width="200"
+                                   @confirm="handleDeleteSKU(row)">
+                        <template #reference>
+                            <el-button type="danger" icon="Delete" size="small">删除</el-button>
+                        </template>
+                    </el-popconfirm>
                 </template>
             </el-table-column>
         </el-table>
@@ -105,7 +110,7 @@ import {ElMessage} from "element-plus";
 
 import {SKUData, SkuInfoData} from "@/api/product/sku/types";
 import type {SKUResponseData} from "@/api/product/sku/types";
-import {reqCancelSaleSku, reqSaleSku, reqSkuInfo, reqSKUList} from "@/api/product/sku";
+import {reqCancelSaleSku, reqRemoveSku, reqSaleSku, reqSkuInfo, reqSKUList} from "@/api/product/sku";
 
 interface DrawerDataType {
     data: SKUData
@@ -163,6 +168,17 @@ const showSKUDetail = async (row: SKUData) => {
     const result: SkuInfoData = await reqSkuInfo(row.id);
     if (result.code === 200) {
         drawerData.data = result.data;
+    }
+}
+
+//删除SKU按钮点击回调
+const handleDeleteSKU = async (row: SKUData) => {
+    const result: any = await reqRemoveSku(row.id);
+    if (result.code === 200) {
+        ElMessage.success('删除成功！');
+        getSKUData();//重新查询数据
+    } else {
+        ElMessage.error(`删除失败！${result.data}`);
     }
 }
 
