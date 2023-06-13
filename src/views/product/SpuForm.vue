@@ -136,7 +136,8 @@ let saleAttrValueInputs = reactive<any>([]);//SPU销售属性表格中，属性�
 
 //保存按钮禁用条件，SPU名称、品牌、描述必须同时输入，才能提交
 let saveBtnDisabled: boolean = computed(() =>
-    !spuParams.data.spuName || !spuParams.data.tmId || !spuParams.data.description);
+    !spuParams.data.spuName || !spuParams.data.spuName.trim() ||
+    !spuParams.data.tmId || !spuParams.data.description || !spuParams.data.description.trim());
 
 //照片墙文件上传前回调
 const beforeImgUpload: UploadProps['beforeUpload'] = rawFile => {
