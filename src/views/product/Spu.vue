@@ -5,7 +5,7 @@
         <!--展示SPU信息-->
         <div v-show="scene===0">
             <el-button type="primary" icon="Plus" class="add-spu"
-                       @click="handleAddSPU">
+                       @click="handleAddSPU" :disabled="!categoryStore.c3Id">
                 添加SPU
             </el-button>
 
