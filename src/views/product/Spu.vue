@@ -27,7 +27,12 @@
                         <el-button type="primary" icon="View" size="small" @click="handleViewSKUs(row)">
                             查看
                         </el-button>
-                        <el-button type="danger" icon="Delete" size="small">删除</el-button>
+                        <el-popconfirm title="是否确认删除此SPU？" width="200"
+                                       @confirm="handleRemoveSPU(row)">
+                            <template #reference>
+                                <el-button type="danger" icon="Delete" size="small">删除</el-button>
+                            </template>
+                        </el-popconfirm>
                     </template>
                 </el-table-column>
             </el-table>
@@ -72,7 +77,7 @@ import {useCategoryStore} from "@/stores/modules/category";
 import type {
     ExistingSPUResponseData, Records, SKUData, SkuInfoData, SPUData
 } from "@/api/product/spu/types";
-import {reqSKUList, reqExistingSPU} from "@/api/product/spu";
+import {reqSKUList, reqExistingSPU, reqRemoveSPU} from "@/api/product/spu";
 
 const categoryStore = useCategoryStore();
 let pageNo = ref<number>(1);//表格当前页码
@@ -146,6 +151,17 @@ const handleViewSKUs = async (row: SPUData) => {
         result.data.forEach(item => SKUDialogData.push(item));
     } else {
         ElMessage.error(`查询数据失败！${result.data}`);
+    }
+}
+
+//删除SPU按钮点击回调
+const handleRemoveSPU = async (row: SPUData) => {
+    const result: any = await reqRemoveSPU(row.id);
+    if (result.code == 200) {
+        ElMessage.success('删除成功！');
+        getExistingSPU();//重新查询数据
+    } else {
+        ElMessage.error(`删除失败！${result.data}`);
     }
 }
 
