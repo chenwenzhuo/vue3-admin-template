@@ -24,7 +24,9 @@
                             编辑
                         </el-button>
                         <div style="margin: 3px 0"></div>
-                        <el-button type="primary" icon="View" size="small">查看</el-button>
+                        <el-button type="primary" icon="View" size="small" @click="handleViewSKUs(row)">
+                            查看
+                        </el-button>
                         <el-button type="danger" icon="Delete" size="small">删除</el-button>
                     </template>
                 </el-table-column>
@@ -40,20 +42,37 @@
 
         <!--添加SKU的结构-->
         <SkuForm ref="skuFormRef" v-show="scene===2" @changeScene="changeScene"/>
+
+        <!--查看SPU下SKU-->
+        <el-dialog :model-value="viewSKUDialogDisplay" title="SKU列表"
+                   @close="handleCloseDialog">
+            <el-table :data="SKUDialogData" border>
+                <el-table-column type="index" label="序号" width="80" align="center"/>
+                <el-table-column prop="skuName" label="名称" width="240" align="center"/>
+                <el-table-column prop="price" label="价格（元）" width="100" align="center"/>
+                <el-table-column prop="weight" label="重量（克）" width="100" align="center"/>
+                <el-table-column label="图片" align="center">
+                    <template #default="{row}">
+                        <img :src="row.skuDefaultImg" alt="图片" style="width: 160px"/>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-dialog>
     </el-card>
 </template>
 
 <script setup lang="ts">
 import {reactive, ref, watch} from "vue";
+import {ElMessage} from "element-plus";
 
 import CategorySelect from "@/components/CategorySelect.vue";
 import SpuForm from "@/views/product/SpuForm.vue";
 import SkuForm from "@/views/product/SkuForm.vue";
 import {useCategoryStore} from "@/stores/modules/category";
 import type {
-    ExistingSPUResponseData, Records, SPUData
+    ExistingSPUResponseData, Records, SKUData, SkuInfoData, SPUData
 } from "@/api/product/spu/types";
-import {reqExistingSPU} from "@/api/product/spu";
+import {reqSKUList, reqExistingSPU} from "@/api/product/spu";
 
 const categoryStore = useCategoryStore();
 let pageNo = ref<number>(1);//表格当前页码
@@ -65,6 +84,9 @@ const SPUTableData = reactive<Records>([]);//SPU表格数据
 let scene = ref<number>(0);
 const spuFormRef = ref<any>();//子组件SpuForm实例
 const skuFormRef = ref<any>();//子组件SkuForm实例
+
+let viewSKUDialogDisplay = ref<boolean>(false);//查看SPU下SKU对话框是否展示
+let SKUDialogData = reactive<SKUData[]>([]);//查看SPU下SKU对话框展示的数据
 
 //监听仓库中三级分类id，有值时查询SPU数据
 watch(() => categoryStore.c3Id, () => {
@@ -114,6 +136,23 @@ const handleUpdateSPU = (row: SPUData) => {
     scene.value = 1;//切换到添加/修改页面
     //调用子组件方法，初始化数据
     spuFormRef.value.initSPUData(row);
+}
+
+//查看SPU下SKU按钮的点击回调
+const handleViewSKUs = async (row: SPUData) => {
+    const result: SkuInfoData = await reqSKUList(row.id);
+    if (result.code === 200) {
+        viewSKUDialogDisplay.value = true;//展示弹窗
+        result.data.forEach(item => SKUDialogData.push(item));
+    } else {
+        ElMessage.error(`查询数据失败！${result.data}`);
+    }
+}
+
+//查看SPU下SKU弹窗关闭的回调
+const handleCloseDialog = () => {
+    viewSKUDialogDisplay.value = false;//关闭弹窗
+    SKUDialogData.length = 0;//清除数据
 }
 
 //切换场景，传递给子组件使用

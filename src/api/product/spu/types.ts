@@ -122,3 +122,8 @@ export interface SKUData {
         saleAttrValueId: number | string
     }]
 }
+
+//获取SKU数据接口的ts类型
+export interface SkuInfoData extends ResponseData {
+    data: SKUData[]
+}
