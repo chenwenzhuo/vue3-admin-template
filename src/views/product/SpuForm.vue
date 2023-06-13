@@ -76,7 +76,7 @@
             </el-table>
         </el-form-item>
         <el-form-item style="margin-top: 20px">
-            <el-button type="primary" @click="saveSPU">保存</el-button>
+            <el-button type="primary" @click="saveSPU" :disabled="saveBtnDisabled">保存</el-button>
             <el-button @click="handleCancel('cancel')">取消</el-button>
         </el-form-item>
     </el-form>
@@ -133,6 +133,10 @@ let picCardPreviewUrl = ref<string>('');//照片墙预览图片url
 
 let saleAttrIdAndValueName = ref<string>('');//SPU销售属性下拉框被选择项的值
 let saleAttrValueInputs = reactive<any>([]);//SPU销售属性表格中，属性值input组件ref数组
+
+//保存按钮禁用条件，SPU名称、品牌、描述必须同时输入，才能提交
+let saveBtnDisabled: boolean = computed(() =>
+    !spuParams.data.spuName || !spuParams.data.tmId || !spuParams.data.description);
 
 //照片墙文件上传前回调
 const beforeImgUpload: UploadProps['beforeUpload'] = rawFile => {
