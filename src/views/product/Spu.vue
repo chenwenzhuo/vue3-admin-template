@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, watch} from "vue";
+import {onBeforeUnmount, reactive, ref, watch} from "vue";
 import {ElMessage} from "element-plus";
 
 import CategorySelect from "@/components/CategorySelect.vue";
@@ -184,6 +184,9 @@ const changeScene = (obj: any) => {
         getExistingSPU();
     }
 }
+
+//组件卸载前清除pinia仓库数据
+onBeforeUnmount(() => categoryStore.resetCategory());
 </script>
 
 <style scoped lang="scss">
