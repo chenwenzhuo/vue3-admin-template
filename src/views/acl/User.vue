@@ -68,9 +68,10 @@
 
 <script setup lang="ts">
 import {onMounted, reactive, ref} from "vue";
-import {ElMessage} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
 import type {FormInstance, FormRules} from "element-plus";
 
+import {useUserStore} from "@/stores/modules/user";
 import type {UserData, UserInfoResponseData} from "@/api/acl/user/types";
 import {reqAddOrUpdateUser, reqUsersInfo} from "@/api/acl/user";
 
@@ -82,6 +83,7 @@ interface AddUpdateDataType {
     data: UserData
 }
 
+const userStore = useUserStore();//当前登录的用户数据
 let pageNo = ref<number>(1);//分页器页码
 let pageSize = ref<number>(10);//分页器页大小
 let total = ref<number>(0);//分页器总数据条数
@@ -95,6 +97,7 @@ const addUpdateFormRef = ref<FormInstance>();//添加、修改用户表单引用
 let addUpdateFormData = reactive<AddUpdateDataType>({//添加、修改用户表单的数据
     data: {username: '', password: '', name: ''}
 });
+let updatingCurrentUser = ref<boolean>(false);//更新用户时，是否更新的当前已登录用户
 //添加、修改用户表单的校验规则
 const addUpdateFormRules = reactive<FormRules>({
     username: [{required: true, validator: validateUsername, trigger: 'blur'}],
@@ -123,6 +126,8 @@ const updateUser = (row: UserData) => {
     addUpdateFormData.data = row;
     addOrUpdateUserFlag.value = false;//更新用户
     drawerDisplayFlag.value = true;//展示抽屉组件
+    //是否正更新当前已登录用户
+    updatingCurrentUser.value = (row.username === userStore.userState.username);
 }
 
 //抽屉组件确认按钮点击回调
@@ -132,8 +137,21 @@ const confirmAddOrUpdateUser = () => {
         let result: any = await reqAddOrUpdateUser(addUpdateFormData.data);
         if (result.code === 200) {
             ElMessage.success(`${addOrUpdateUserFlag.value ? '添加' : '更新'}用户成功！`);
-            onDrawerClose();//关闭抽屉
-            getUserInfo();//重新查询用户数据
+            //若执行更新，且更新了当前已登录用户
+            if (!addOrUpdateUserFlag.value && updatingCurrentUser.value) {
+                //弹窗提示
+                ElMessageBox.alert(
+                    '当前登录用户已被修改，请重新登录！', '提示', {
+                        confirmButtonText: '确定',
+                        type: 'warning',
+                        center: true,
+                        'show-close': false
+                    }
+                ).then(() => window.location.reload());
+            } else {
+                onDrawerClose();//关闭抽屉
+                getUserInfo();//重新查询用户数据
+            }
         } else {
             ElMessage.error(`${addOrUpdateUserFlag.value ? '添加' : '更新'}用户失败！${result.data}`);
         }
@@ -142,10 +160,11 @@ const confirmAddOrUpdateUser = () => {
 
 //抽屉组件关闭的回调
 const onDrawerClose = () => {
-    addUpdateFormData.data = {};//清除数据
+    addUpdateFormData.data = {username: '', password: '', name: ''};//清除数据
     drawerDisplayFlag.value = false;//隐藏抽屉组件
     //清除表单校验结果
     addUpdateFormRef.value?.clearValidate();
+    updatingCurrentUser.value = false;
 }
 
 //表格选中项发生变化的回调
