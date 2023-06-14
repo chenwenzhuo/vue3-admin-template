@@ -60,7 +60,7 @@
             </el-form>
             <template #footer>
                 <el-button type="primary" @click="confirmAddOrUpdateUser">确定</el-button>
-                <el-button @close="onDrawerClose">取消</el-button>
+                <el-button @click="onDrawerClose">取消</el-button>
             </template>
         </el-drawer>
     </el-card>
@@ -92,19 +92,14 @@ let userTableSelection = reactive<SelectedUsersType>({data: []});//用户表格�
 let addOrUpdateUserFlag = ref<boolean>(true);//标志位，true-添加用户，false-修改用户
 let drawerDisplayFlag = ref<boolean>(false);//控制是否显示抽屉组件
 const addUpdateFormRef = ref<FormInstance>();//添加、修改用户表单引用
-let addUpdateFormData = reactive<AddUpdateDataType>({data: {}});//添加、修改用户表单的数据
+let addUpdateFormData = reactive<AddUpdateDataType>({//添加、修改用户表单的数据
+    data: {username: '', password: '', name: ''}
+});
 //添加、修改用户表单的校验规则
 const addUpdateFormRules = reactive<FormRules>({
-    username: [
-        {required: true, message: '用户名必须输入', trigger: 'blur'},
-        {min: 5, message: '用户名长度不少于5位', trigger: 'change'},
-        {max: 18, message: '用户名长度不多于18位', trigger: 'change'},
-    ],
-    name: [{required: true, message: '用户昵称必须输入', trigger: 'blur'},],
-    password: [
-        {required: true, message: '密码必须输入', trigger: 'blur'},
-        {min: 6, message: '密码长度不少于6位', trigger: 'change'},
-    ]
+    username: [{required: true, validator: validateUsername, trigger: 'blur'}],
+    name: [{required: true, validator: validateName, trigger: 'blur'}],
+    password: [{required: true, validator: validatePassword, trigger: 'blur'}]
 });
 
 //获取用户信息
@@ -131,15 +126,18 @@ const updateUser = (row: UserData) => {
 }
 
 //抽屉组件确认按钮点击回调
-const confirmAddOrUpdateUser = async () => {
-    let result: any = await reqAddOrUpdateUser(addUpdateFormData.data);
-    if (result.code === 200) {
-        ElMessage.success(`${addOrUpdateUserFlag.value ? '添加' : '更新'}用户成功！`);
-        onDrawerClose();//关闭抽屉
-        getUserInfo();//重新查询用户数据
-    } else {
-        ElMessage.error(`${addOrUpdateUserFlag.value ? '添加' : '更新'}用户失败！${result.data}`);
-    }
+const confirmAddOrUpdateUser = () => {
+    addUpdateFormRef.value?.validate(async (valid) => {
+        if (!valid) return;
+        let result: any = await reqAddOrUpdateUser(addUpdateFormData.data);
+        if (result.code === 200) {
+            ElMessage.success(`${addOrUpdateUserFlag.value ? '添加' : '更新'}用户成功！`);
+            onDrawerClose();//关闭抽屉
+            getUserInfo();//重新查询用户数据
+        } else {
+            ElMessage.error(`${addOrUpdateUserFlag.value ? '添加' : '更新'}用户失败！${result.data}`);
+        }
+    });
 }
 
 //抽屉组件关闭的回调
@@ -153,6 +151,45 @@ const onDrawerClose = () => {
 //表格选中项发生变化的回调
 const tableSelectionChange = (selections: UserData[]) => {
     userTableSelection.data = selections;
+}
+
+//添加、修改用户，用户名自定义校验
+function validateUsername(rule: any, value: any, callBack: any) {
+    let realValue = value.trim();
+    if (realValue.length === 0)
+        callBack(new Error('用户名必须输入'));
+    else if (realValue.length < 5)
+        callBack(new Error('用户名长度不少于5位'));
+    else if (realValue.length > 18)
+        callBack(new Error('用户名长度不多于18位'));
+    else
+        callBack();
+}
+
+//添加、修改用户，用户昵称自定义校验
+function validateName(rule: any, value: any, callBack: any) {
+    let realValue = value.trim();
+    if (realValue.length === 0)
+        callBack(new Error('昵称必须输入'));
+    else if (realValue.length > 10)
+        callBack(new Error('昵称长度不多于10位'));
+    else
+        callBack();
+}
+
+//添加、修改用户，用户密码自定义校验
+function validatePassword(rule: any, value: any, callBack: any) {
+    let realValue = value.trim();
+    if (realValue.length === 0) {
+        //若全输入空格，将其清空
+        addUpdateFormData.data.password = '';
+        callBack(new Error('密码必须输入'));
+    } else if (realValue.length < 6)
+        callBack(new Error('密码长度不少于6位'));
+    else if (realValue.length > 24)
+        callBack(new Error('密码长度不多于24位'));
+    else
+        callBack();
 }
 
 onMounted(() => {
