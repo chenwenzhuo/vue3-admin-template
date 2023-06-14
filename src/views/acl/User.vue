@@ -156,9 +156,11 @@ const tableSelectionChange = (selections: UserData[]) => {
 //添加、修改用户，用户名自定义校验
 function validateUsername(rule: any, value: any, callBack: any) {
     let realValue = value.trim();
-    if (realValue.length === 0)
+    if (realValue.length === 0) {
+        //若全输入空格，将其清空
+        addUpdateFormData.data.username = '';
         callBack(new Error('用户名必须输入'));
-    else if (realValue.length < 5)
+    } else if (realValue.length < 5)
         callBack(new Error('用户名长度不少于5位'));
     else if (realValue.length > 18)
         callBack(new Error('用户名长度不多于18位'));
@@ -169,9 +171,11 @@ function validateUsername(rule: any, value: any, callBack: any) {
 //添加、修改用户，用户昵称自定义校验
 function validateName(rule: any, value: any, callBack: any) {
     let realValue = value.trim();
-    if (realValue.length === 0)
+    if (realValue.length === 0) {
+        //若全输入空格，将其清空
+        addUpdateFormData.data.name = '';
         callBack(new Error('昵称必须输入'));
-    else if (realValue.length > 10)
+    } else if (realValue.length > 10)
         callBack(new Error('昵称长度不多于10位'));
     else
         callBack();
