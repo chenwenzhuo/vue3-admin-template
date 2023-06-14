@@ -1,5 +1,4 @@
 <template>
-    <div>权限管理主页</div>
     <router-view/>
 </template>
 
