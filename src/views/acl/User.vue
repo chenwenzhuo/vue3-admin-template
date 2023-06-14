@@ -68,6 +68,7 @@
 
 <script setup lang="ts">
 import {onMounted, reactive, ref} from "vue";
+import {useRoute, useRouter} from "vue-router";
 import {ElMessage, ElMessageBox} from "element-plus";
 import type {FormInstance, FormRules} from "element-plus";
 
@@ -84,6 +85,9 @@ interface AddUpdateDataType {
 }
 
 const userStore = useUserStore();//当前登录的用户数据
+const $route = useRoute();
+const $router = useRouter();
+
 let pageNo = ref<number>(1);//分页器页码
 let pageSize = ref<number>(10);//分页器页大小
 let total = ref<number>(0);//分页器总数据条数
@@ -147,7 +151,10 @@ const confirmAddOrUpdateUser = () => {
                         center: true,
                         'show-close': false
                     }
-                ).then(() => window.location.reload());
+                ).then(async () => {
+                    await userStore.userLogout();
+                    $router.replace({path: '/login', query: {redirect: $route.path}});
+                });
             } else {
                 onDrawerClose();//关闭抽屉
                 getUserInfo();//重新查询用户数据
