@@ -16,7 +16,8 @@
     <el-card class="card-table">
         <template #header>
             <el-button type="primary" @click="addUser">添加用户</el-button>
-            <el-button type="danger" :disabled="userTableSelection.data.length===0">
+            <el-button type="danger" :disabled="userTableSelection.data.length===0"
+                       @click="removeUserBatch">
                 批量删除
             </el-button>
         </template>
@@ -34,7 +35,12 @@
                 <template #default="{row}">
                     <el-button type="primary" icon="User" size="small" @click="assignRole(row)">分配角色</el-button>
                     <el-button type="primary" icon="Edit" size="small" @click="updateUser(row)">编辑</el-button>
-                    <el-button type="danger" icon="Delete" size="small">删除</el-button>
+                    <el-popconfirm :title="`是否确认删除用户${row.username}？`" width="280"
+                                   @confirm="removeUser(row)">
+                        <template #reference>
+                            <el-button type="danger" icon="Delete" size="small">删除</el-button>
+                        </template>
+                    </el-popconfirm>
                 </template>
             </el-table-column>
         </el-table>
@@ -101,7 +107,14 @@ import type {FormInstance, FormRules} from "element-plus";
 
 import {useUserStore} from "@/stores/modules/user";
 import type {AllRolesResponseData, RoleList, UserData, UserInfoResponseData} from "@/api/acl/user/types";
-import {reqAddOrUpdateUser, reqAllRoles, reqSetUserRole, reqUsersInfo} from "@/api/acl/user";
+import {
+    reqAddOrUpdateUser,
+    reqAllRoles,
+    reqRemoveUser,
+    reqRemoveUserBatch,
+    reqSetUserRole,
+    reqUsersInfo
+} from "@/api/acl/user";
 
 interface SelectedUsersType {
     data: UserData[]
@@ -128,7 +141,7 @@ const addUpdateFormRef = ref<FormInstance>();//添加、修改用户表单引用
 let addUpdateFormData = reactive<UserDataType>({//添加、修改用户表单的数据
     data: {username: '', password: '', name: ''}
 });
-let updatingCurrentUser = ref<boolean>(false);//更新用户时，是否更新的当前已登录用户
+let operatingCurrentUser = ref<boolean>(false);//更新、删除用户时，是否操作的当前已登录用户
 //添加、修改用户表单的校验规则
 const addUpdateFormRules = reactive<FormRules>({
     username: [{required: true, validator: validateUsername, trigger: 'blur'}],
@@ -168,7 +181,7 @@ const updateUser = (row: UserData) => {
     addOrUpdateUserFlag.value = false;//更新用户
     userDrawerDisplayFlag.value = true;//展示抽屉组件
     //是否正更新当前已登录用户
-    updatingCurrentUser.value = (row.username === userStore.userState.username);
+    operatingCurrentUser.value = (row.username === userStore.userState.username);
 }
 
 //用户抽屉组件确认按钮点击回调
@@ -179,7 +192,7 @@ const confirmAddOrUpdateUser = () => {
         if (result.code === 200) {
             ElMessage.success(`${addOrUpdateUserFlag.value ? '添加' : '更新'}用户成功！`);
             //若执行更新，且更新了当前已登录用户
-            if (!addOrUpdateUserFlag.value && updatingCurrentUser.value) {
+            if (!addOrUpdateUserFlag.value && operatingCurrentUser.value) {
                 //弹窗提示
                 ElMessageBox.alert(
                     '当前登录用户已被修改，请重新登录！', '提示', {
@@ -208,7 +221,7 @@ const onUserDrawerClose = () => {
     userDrawerDisplayFlag.value = false;//隐藏抽屉组件
     //清除表单校验结果
     addUpdateFormRef.value?.clearValidate();
-    updatingCurrentUser.value = false;
+    operatingCurrentUser.value = false;
 }
 
 //分配角色按钮点击回调
@@ -255,7 +268,7 @@ const confirmAssignRoles = async () => {
         onRoleDrawerClose();//关闭抽屉
         getUserInfo();//重新查询用户数据
     } else {
-        ElMessage.success(`分配角色失败！${result.data}`);
+        ElMessage.error(`分配角色失败！${result.data}`);
     }
 }
 
@@ -272,6 +285,69 @@ const onRoleDrawerClose = () => {
 //表格选中项发生变化的回调
 const tableSelectionChange = (selections: UserData[]) => {
     userTableSelection.data = selections;
+}
+
+//删除一个用户
+const removeUser = async (row: UserData) => {
+    //是否正删除当前已登录用户
+    operatingCurrentUser.value = (row.username === userStore.userState.username);
+
+    const result: any = await reqRemoveUser(row.id);
+    if (result.code === 200) {
+        ElMessage.success('删除用户成功！');
+        //若删除了当前已登录用户
+        if (operatingCurrentUser.value) {
+            //弹窗提示
+            ElMessageBox.alert(
+                '当前登录用户已被删除，请重新登录！', '提示', {
+                    confirmButtonText: '确定',
+                    type: 'warning',
+                    center: true,
+                    'show-close': false
+                }
+            ).then(async () => {
+                await userStore.userLogout();
+                $router.replace({path: '/login', query: {redirect: $route.path}});
+            });
+        } else {
+            getUserInfo();//重新查询用户数据
+        }
+    } else {
+        ElMessage.error(`删除用户失败！${result.data}`);
+    }
+}
+
+//批量删除用户
+const removeUserBatch = async () => {
+    //获取已选择用户的id列表，并检查是否正删除当前已登录用户
+    const idList: number[] = userTableSelection.data.map(item => {
+        if (item.username === userStore.userState.username)
+            operatingCurrentUser.value = true;
+        return item.id;
+    });
+    const result: any = await reqRemoveUserBatch(idList);
+    if (result.code === 200) {
+        ElMessage.success('删除用户成功！');
+        //若删除了当前已登录用户
+        if (operatingCurrentUser.value) {
+            //弹窗提示
+            ElMessageBox.alert(
+                '当前登录用户已被删除，请重新登录！', '提示', {
+                    confirmButtonText: '确定',
+                    type: 'warning',
+                    center: true,
+                    'show-close': false
+                }
+            ).then(async () => {
+                await userStore.userLogout();
+                $router.replace({path: '/login', query: {redirect: $route.path}});
+            });
+        } else {
+            getUserInfo();//重新查询用户数据
+        }
+    } else {
+        ElMessage.error(`删除用户失败！${result.data}`);
+    }
 }
 
 //添加、修改用户，用户名自定义校验
