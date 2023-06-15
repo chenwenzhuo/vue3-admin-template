@@ -3,11 +3,14 @@
     <el-card>
         <el-form inline class="search-form">
             <el-form-item label="用户名">
-                <el-input placeholder="请输入用户名"/>
+                <el-input v-model="searchingKeyword" placeholder="请输入用户名"/>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary">搜索</el-button>
-                <el-button type="primary">重置</el-button>
+                <el-button type="primary" @click="getUserInfo"
+                           :disabled="!searchingKeyword">
+                    搜索
+                </el-button>
+                <el-button type="primary" @click="resetSearchUsers">重置</el-button>
             </el-form-item>
         </el-form>
     </el-card>
@@ -132,6 +135,7 @@ let pageNo = ref<number>(1);//分页器页码
 let pageSize = ref<number>(10);//分页器页大小
 let total = ref<number>(0);//分页器总数据条数
 
+let searchingKeyword = ref<string>('');//搜索用户的关键词
 let userTableData = reactive<UserData[]>([]);//用户表格数据
 let userTableSelection = reactive<SelectedUsersType>({data: []});//用户表格选中项
 
@@ -161,12 +165,18 @@ let checkedRoles = ref<RoleList>([]);//选中的角色
 
 //获取用户信息
 const getUserInfo = async () => {
-    const result: UserInfoResponseData = await reqUsersInfo(pageNo.value, pageSize.value);
+    const result: UserInfoResponseData = await reqUsersInfo(pageNo.value, pageSize.value, searchingKeyword.value);
     if (result.code === 200) {
         userTableData.length = 0;
         result.data.records.forEach(item => userTableData.push(item));
         total.value = result.data.total;
     }
+}
+
+//重置搜索用户
+const resetSearchUsers = () => {
+    searchingKeyword.value = '';//清除关键词
+    getUserInfo();//重新查询
 }
 
 //添加用户按钮点击回调

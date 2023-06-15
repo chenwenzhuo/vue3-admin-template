@@ -13,8 +13,8 @@ enum API {
 }
 
 //查询所有用户
-export const reqUsersInfo = (pageNo: number, limit: number) =>
-    request.get<any, UserInfoResponseData>(`${API.USER_INFO_URL}/${pageNo}/${limit}`);
+export const reqUsersInfo = (pageNo: number, limit: number, username: string) =>
+    request.get<any, UserInfoResponseData>(`${API.USER_INFO_URL}/${pageNo}/${limit}/?username=${username}`);
 
 //添加一个新的用户或更新已有的用户
 export const reqAddOrUpdateUser = (data: UserData) => {
