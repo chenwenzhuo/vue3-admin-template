@@ -32,7 +32,7 @@
             <el-table-column prop="updateTime" label="更新时间" align="center" :show-overflow-tooltip="true"/>
             <el-table-column label="操作" width="280" align="center">
                 <template #default="{row}">
-                    <el-button type="primary" icon="User" size="small">分配角色</el-button>
+                    <el-button type="primary" icon="User" size="small" @click="assignRole(row)">分配角色</el-button>
                     <el-button type="primary" icon="Edit" size="small" @click="updateUser(row)">编辑</el-button>
                     <el-button type="danger" icon="Delete" size="small">删除</el-button>
                 </template>
@@ -63,6 +63,33 @@
                 <el-button @click="onUserDrawerClose">取消</el-button>
             </template>
         </el-drawer>
+
+        <!--抽屉组件，用于分配用户角色-->
+        <el-drawer v-model="roleDrawerDisplayFlag" title="分配用户角色"
+                   direction="rtl" @close="onRoleDrawerClose">
+            <el-form>
+                <el-form-item label="用户名称">
+                    <el-input v-model="assignRoleFormData.data.username" disabled/>
+                </el-form-item>
+                <el-form-item label="角色列表">
+                    <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate"
+                                 @change="handleCheckAllChange"
+                                 style="margin-right: 10px">
+                        全选
+                    </el-checkbox>
+                    <!--所有可选择的职位复选框-->
+                    <el-checkbox-group v-model="checkedRoles" @change="handleCheckedRolesChange">
+                        <el-checkbox v-for="role in allRoles" :key="role.id" :label="role">
+                            {{ role.roleName }}
+                        </el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button type="primary" @click="confirmAssignRoles">确定</el-button>
+                <el-button @click="onRoleDrawerClose">取消</el-button>
+            </template>
+        </el-drawer>
     </el-card>
 </template>
 
@@ -73,14 +100,14 @@ import {ElMessage, ElMessageBox} from "element-plus";
 import type {FormInstance, FormRules} from "element-plus";
 
 import {useUserStore} from "@/stores/modules/user";
-import type {UserData, UserInfoResponseData} from "@/api/acl/user/types";
-import {reqAddOrUpdateUser, reqUsersInfo} from "@/api/acl/user";
+import type {AllRolesResponseData, RoleList, UserData, UserInfoResponseData} from "@/api/acl/user/types";
+import {reqAddOrUpdateUser, reqAllRoles, reqSetUserRole, reqUsersInfo} from "@/api/acl/user";
 
 interface SelectedUsersType {
     data: UserData[]
 }
 
-interface AddUpdateDataType {
+interface UserDataType {
     data: UserData
 }
 
@@ -98,7 +125,7 @@ let userTableSelection = reactive<SelectedUsersType>({data: []});//用户表格�
 let addOrUpdateUserFlag = ref<boolean>(true);//标志位，true-添加用户，false-修改用户
 let userDrawerDisplayFlag = ref<boolean>(false);//控制是否显示抽屉组件
 const addUpdateFormRef = ref<FormInstance>();//添加、修改用户表单引用
-let addUpdateFormData = reactive<AddUpdateDataType>({//添加、修改用户表单的数据
+let addUpdateFormData = reactive<UserDataType>({//添加、修改用户表单的数据
     data: {username: '', password: '', name: ''}
 });
 let updatingCurrentUser = ref<boolean>(false);//更新用户时，是否更新的当前已登录用户
@@ -108,6 +135,16 @@ const addUpdateFormRules = reactive<FormRules>({
     name: [{required: true, validator: validateName, trigger: 'blur'}],
     password: [{required: true, validator: validatePassword, trigger: 'blur'}]
 });
+
+let roleDrawerDisplayFlag = ref<boolean>(false);//控制是否显示抽屉组件
+let assignRoleFormData = reactive<UserDataType>({//用户角色设置表单的数据
+    data: {}
+});
+let checkAll = ref<boolean>(false);//角色列表复选框是否全选
+let isIndeterminate = ref<boolean>(false);//复选框未全部选中时，“全选”复选框是否展示中间状态
+let allRoles = reactive<RoleList>([]);//所有角色列表
+//疑似bug：el-checkbox-group组件v-model绑定的数据必须用ref定义，使用reactive会导致不能改变选项的情况
+let checkedRoles = ref<RoleList>([]);//选中的角色
 
 //获取用户信息
 const getUserInfo = async () => {
@@ -165,13 +202,71 @@ const confirmAddOrUpdateUser = () => {
     });
 }
 
-//抽屉组件关闭的回调
+//添加、更新用户抽屉组件关闭的回调
 const onUserDrawerClose = () => {
     addUpdateFormData.data = {username: '', password: '', name: ''};//清除数据
     userDrawerDisplayFlag.value = false;//隐藏抽屉组件
     //清除表单校验结果
     addUpdateFormRef.value?.clearValidate();
     updatingCurrentUser.value = false;
+}
+
+//分配角色按钮点击回调
+const assignRole = (row: UserData) => {
+    roleDrawerDisplayFlag.value = true;
+    assignRoleFormData.data = row;
+    getRoles(row);
+}
+
+//角色列表全选复选框变化的回调
+const handleCheckAllChange = (allChecked: boolean) => {
+    isIndeterminate.value = false;//取消“全选”复选框的中间状态
+    checkedRoles.value = allChecked ? allRoles : [];//更新选中项
+}
+
+//角色列表选中项变化的回调
+const handleCheckedRolesChange = (value: string[]) => {
+    const checkedCount = value.length;
+    checkAll.value = checkedCount === allRoles.length;//判断是否全选
+    //判断是否展示“全选”复选框的中间状态
+    isIndeterminate.value = checkedCount > 0 && checkedCount < allRoles.length;
+}
+
+//查询用户已有的角色，及所有角色列表
+const getRoles = async (row: UserData) => {
+    const result: AllRolesResponseData = await reqAllRoles(row.id);
+    if (result.code === 200) {
+        //记录所有角色
+        allRoles.length = 0;
+        result.data.allRolesList.forEach(item => allRoles.push(item));
+        //记录已有的角色
+        checkedRoles.value = result.data.assignRoles;
+    }
+}
+
+//分配角色抽屉组件中确定按钮点击回调
+const confirmAssignRoles = async () => {
+    //角色id列表，由选中的角色列表映射得到
+    const roleIdList: number[] = checkedRoles.value.map(item => item.id);
+    //发送请求
+    const result: any = await reqSetUserRole({roleIdList, userId: assignRoleFormData.data.id});
+    if (result.code === 200) {
+        ElMessage.success('分配角色成功！');
+        onRoleDrawerClose();//关闭抽屉
+        getUserInfo();//重新查询用户数据
+    } else {
+        ElMessage.success(`分配角色失败！${result.data}`);
+    }
+}
+
+//分配角色抽屉组件关闭的回调
+const onRoleDrawerClose = () => {
+    roleDrawerDisplayFlag.value = false;
+    assignRoleFormData.data = {};
+    checkAll.value = false;
+    isIndeterminate.value = false;
+    allRoles.length = 0;
+    checkedRoles.value = [];
 }
 
 //表格选中项发生变化的回调
