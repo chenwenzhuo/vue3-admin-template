@@ -43,7 +43,7 @@
                        :page-sizes="[5,10,20]" @current-change="getUserInfo" @size-change="getUserInfo"/>
 
         <!--抽屉组件，用于新增、修改用户-->
-        <el-drawer v-model="drawerDisplayFlag" :title="`${addOrUpdateUserFlag?'添加':'更新'}用户`"
+        <el-drawer v-model="userDrawerDisplayFlag" :title="`${addOrUpdateUserFlag?'添加':'更新'}用户`"
                    direction="rtl" @close="onUserDrawerClose">
             <el-form ref="addUpdateFormRef" :model="addUpdateFormData.data"
                      :rules="addUpdateFormRules">
@@ -96,7 +96,7 @@ let userTableData = reactive<UserData[]>([]);//用户表格数据
 let userTableSelection = reactive<SelectedUsersType>({data: []});//用户表格选中项
 
 let addOrUpdateUserFlag = ref<boolean>(true);//标志位，true-添加用户，false-修改用户
-let drawerDisplayFlag = ref<boolean>(false);//控制是否显示抽屉组件
+let userDrawerDisplayFlag = ref<boolean>(false);//控制是否显示抽屉组件
 const addUpdateFormRef = ref<FormInstance>();//添加、修改用户表单引用
 let addUpdateFormData = reactive<AddUpdateDataType>({//添加、修改用户表单的数据
     data: {username: '', password: '', name: ''}
@@ -122,14 +122,14 @@ const getUserInfo = async () => {
 //添加用户按钮点击回调
 const addUser = () => {
     addOrUpdateUserFlag.value = true;//更新用户
-    drawerDisplayFlag.value = true;//展示抽屉组件
+    userDrawerDisplayFlag.value = true;//展示抽屉组件
 }
 
 //更新用户按钮点击回调
 const updateUser = (row: UserData) => {
     addUpdateFormData.data = row;
     addOrUpdateUserFlag.value = false;//更新用户
-    drawerDisplayFlag.value = true;//展示抽屉组件
+    userDrawerDisplayFlag.value = true;//展示抽屉组件
     //是否正更新当前已登录用户
     updatingCurrentUser.value = (row.username === userStore.userState.username);
 }
@@ -168,7 +168,7 @@ const confirmAddOrUpdateUser = () => {
 //抽屉组件关闭的回调
 const onUserDrawerClose = () => {
     addUpdateFormData.data = {username: '', password: '', name: ''};//清除数据
-    drawerDisplayFlag.value = false;//隐藏抽屉组件
+    userDrawerDisplayFlag.value = false;//隐藏抽屉组件
     //清除表单校验结果
     addUpdateFormRef.value?.clearValidate();
     updatingCurrentUser.value = false;
