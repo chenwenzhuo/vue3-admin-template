@@ -44,7 +44,7 @@
 
         <!--抽屉组件，用于新增、修改用户-->
         <el-drawer v-model="drawerDisplayFlag" :title="`${addOrUpdateUserFlag?'添加':'更新'}用户`"
-                   direction="rtl" @close="onDrawerClose">
+                   direction="rtl" @close="onUserDrawerClose">
             <el-form ref="addUpdateFormRef" :model="addUpdateFormData.data"
                      :rules="addUpdateFormRules">
                 <el-form-item label="用户姓名" prop="username">
@@ -60,7 +60,7 @@
             </el-form>
             <template #footer>
                 <el-button type="primary" @click="confirmAddOrUpdateUser">确定</el-button>
-                <el-button @click="onDrawerClose">取消</el-button>
+                <el-button @click="onUserDrawerClose">取消</el-button>
             </template>
         </el-drawer>
     </el-card>
@@ -134,7 +134,7 @@ const updateUser = (row: UserData) => {
     updatingCurrentUser.value = (row.username === userStore.userState.username);
 }
 
-//抽屉组件确认按钮点击回调
+//用户抽屉组件确认按钮点击回调
 const confirmAddOrUpdateUser = () => {
     addUpdateFormRef.value?.validate(async (valid) => {
         if (!valid) return;
@@ -156,7 +156,7 @@ const confirmAddOrUpdateUser = () => {
                     $router.replace({path: '/login', query: {redirect: $route.path}});
                 });
             } else {
-                onDrawerClose();//关闭抽屉
+                onUserDrawerClose();//关闭抽屉
                 getUserInfo();//重新查询用户数据
             }
         } else {
@@ -166,7 +166,7 @@ const confirmAddOrUpdateUser = () => {
 }
 
 //抽屉组件关闭的回调
-const onDrawerClose = () => {
+const onUserDrawerClose = () => {
     addUpdateFormData.data = {username: '', password: '', name: ''};//清除数据
     drawerDisplayFlag.value = false;//隐藏抽屉组件
     //清除表单校验结果
