@@ -73,7 +73,7 @@ export const routesConfig = [{
             meta: {
                 title: '菜单管理',
                 hidden: false,
-                icon: 'Menu'
+                icon: 'More'
             }
         },]
     }, {
