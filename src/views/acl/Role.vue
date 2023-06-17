@@ -32,7 +32,12 @@
                     <el-button type="primary" icon="Filter" size="small" @click="assignPermissions(row)">分配权限
                     </el-button>
                     <el-button type="primary" icon="Edit" size="small" @click="handleUpdateRole(row)">编辑</el-button>
-                    <el-button type="danger" icon="Delete" size="small">删除</el-button>
+                    <el-popconfirm :title="`是否确认删除角色：${row.roleName}？`"
+                                   width="300" @confirm="removeRole(row)">
+                        <template #reference>
+                            <el-button type="danger" icon="Delete" size="small">删除</el-button>
+                        </template>
+                    </el-popconfirm>
                 </template>
             </el-table-column>
         </el-table>
@@ -85,7 +90,7 @@ import type {
     RoleRecords,
     RoleResponseData
 } from "@/api/acl/role/types";
-import {reqAddOrUpdateRole, reqAllRoles, reqPermissionList, reqSetPermissions} from "@/api/acl/role";
+import {reqAddOrUpdateRole, reqAllRoles, reqPermissionList, reqRemoveRole, reqSetPermissions} from "@/api/acl/role";
 
 interface RoleTableDataType {
     data: RoleRecords
@@ -253,6 +258,17 @@ const onDrawerClose = () => {
     operatingRoleData.data = {};
     permissionsData.data = [];
     defaultCheckedPermissions.length = 0;
+}
+
+//删除角色
+const removeRole = async (row: RoleData) => {
+    const result: any = await reqRemoveRole(row.id);
+    if (result.code === 200) {
+        ElMessage.success('删除角色成功！');
+        getAllRoles();//重新查询数据
+    } else {
+        ElMessage.error(`删除角色失败！${result.data}`);
+    }
 }
 
 onMounted(() => {
