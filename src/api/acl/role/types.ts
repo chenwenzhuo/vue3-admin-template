@@ -34,3 +34,26 @@ export interface RoleResponseData extends ResponseData {
         pages: number
     }
 }
+
+//菜单与按钮权限数据的ts类型
+export interface PermissionData {
+    id: number,
+    createTime: string,
+    updateTime: string,
+    pid: number,
+    name: string,
+    code: string,
+    toCode: string,
+    type: number,
+    status: null,
+    level: number,
+    children?: PermissionList,
+    select: boolean
+}
+
+export type PermissionList = PermissionData[];
+
+//菜单权限与按钮权限查询接口的返回数据数据的ts类型
+export interface PermissionResponseData extends ResponseData {
+    data: PermissionList
+}
