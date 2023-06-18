@@ -21,3 +21,6 @@ export const reqAddOrUpdateMenu = (data: MenuParams) => {
         return request.post<any, any>(API.ADD_MENU_URL, data);
     }
 }
+
+//删除已有的菜单
+export const reqRemoveMenu = (menuId: number) => request.delete<any, any>(`${API.DELETE_MENU_URL}/${menuId}`);

@@ -16,9 +16,14 @@
                            @click="handleUpdateMenu(row)">
                     编辑
                 </el-button>
-                <el-button type="danger" size="small" :disabled="row.level===1">
-                    删除
-                </el-button>
+                <el-popconfirm :title="`是否确认删除菜单：${row.name}？`"
+                               width="240" @confirm="handleRemoveMenu(row)">
+                    <template #reference>
+                        <el-button type="danger" size="small" :disabled="row.level===1">
+                            删除
+                        </el-button>
+                    </template>
+                </el-popconfirm>
             </template>
         </el-table-column>
     </el-table>
@@ -47,7 +52,7 @@ import {computed, nextTick, onMounted, reactive, ref} from "vue";
 import type {FormInstance, FormRules} from "element-plus";
 
 import type {Menu, MenuResponseData} from "@/api/acl/menu/types";
-import {reqAddOrUpdateMenu, reqAllMenus} from "@/api/acl/menu";
+import {reqAddOrUpdateMenu, reqAllMenus, reqRemoveMenu} from "@/api/acl/menu";
 import {ElMessage} from "element-plus";
 
 interface MenuTableDataType {
@@ -126,6 +131,17 @@ const confirmAddUpdateMenu = () => {
 const onDialogClose = () => {
     dialogDisplayStatus.value = 0;//关闭弹窗
     addUpdateMenuData.data = {};//清除数据
+}
+
+//删除菜单
+const handleRemoveMenu = async (row: Menu) => {
+    const result: any = await reqRemoveMenu(row.id);
+    if (result.code === 200) {
+        ElMessage.success('删除成功！');
+        getMenusData();//重新查询数据
+    } else {
+        ElMessage.error(`删除失败！${result.data}`);
+    }
 }
 
 onMounted(() => getMenusData());
