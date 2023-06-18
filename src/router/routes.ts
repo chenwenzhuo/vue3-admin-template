@@ -67,8 +67,8 @@ export const routesConfig = [{
                 icon: 'PriceTag'
             }
         }, {
-            path: '/acl/permission',
-            component: import((`@/views/acl/Permission.vue`)),
+            path: '/acl/menu',
+            component: import((`@/views/acl/Menu.vue`)),
             name: 'Permission',
             meta: {
                 title: '菜单管理',
