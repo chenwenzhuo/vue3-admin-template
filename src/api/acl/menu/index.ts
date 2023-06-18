@@ -1,6 +1,6 @@
 //菜单管理相关接口
 import request from "@/utils/request";
-import type {MenuResponseData} from "@/api/acl/menu/types";
+import type {MenuParams, MenuResponseData} from "@/api/acl/menu/types";
 
 //枚举地址
 enum API {
@@ -12,3 +12,12 @@ enum API {
 
 //获取菜单数据
 export const reqAllMenus = () => request.get<any, MenuResponseData>(API.ALL_MENU_URL);
+
+//添加与更新菜单的方法
+export const reqAddOrUpdateMenu = (data: MenuParams) => {
+    if (data.id) {
+        return request.put<any, any>(API.UPDATE_MENU_URL, data);
+    } else {
+        return request.post<any, any>(API.ADD_MENU_URL, data);
+    }
+}
