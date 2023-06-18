@@ -116,6 +116,8 @@ const handleUpdateMenu = (row: Menu) => {
 //弹窗确认按钮点击回调
 const confirmAddUpdateMenu = () => {
     addUpdateMenuFormRef.value?.validate(async valid => {
+        if (!valid)
+            return;
         const result: any = await reqAddOrUpdateMenu(addUpdateMenuData.data);
         if (result.code === 200) {
             ElMessage.success(`${dialogDisplayStatus.value === 1 ? '添加' : '更新'}成功！`);
