@@ -7,6 +7,8 @@ import pinia from "@/stores";
 
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
+//暗黑模式所需样式
+import 'element-plus/theme-chalk/dark/css-vars.css'
 // @ts-ignore
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'

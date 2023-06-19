@@ -15,7 +15,22 @@
         <div class="top-bar-right">
             <el-button size="small" :icon="Refresh" circle @click="refreshPage"/>
             <el-button size="small" :icon="FullScreen" circle @click="fullScreen"/>
-            <el-button size="small" :icon="Setting" circle/>
+            <el-popover placement="bottom-start" title="主题设置"
+                        :width="200" trigger="hover">
+                <template #reference>
+                    <el-button size="small" :icon="Setting" circle/>
+                </template>
+                <el-form>
+                    <el-form-item label="主题颜色">
+                        <el-color-picker v-model="color" show-alpha :predefine="predefineColors"
+                                         @change="setPrimaryColor"/>
+                    </el-form-item>
+                    <el-form-item label="暗黑模式">
+                        <el-switch @change="changeDark" v-model="dark" class="mt-2"
+                                   inline-prompt active-icon="MoonNight" inactive-icon="Sunny"/>
+                    </el-form-item>
+                </el-form>
+            </el-popover>
             <img :src="userStore.userState.avatar" :alt="userStore.userState.username"/>
             <!--用户名下拉菜单-->
             <el-dropdown class="user-drop-down">
@@ -34,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import {reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {
     ArrowRight, FullScreen, Refresh, Setting
@@ -49,6 +65,27 @@ const settingsStore = useSysSettingsStore();
 
 //刷新页面
 const refreshPage = () => settingsStore.doRefresh();
+
+//颜色组件组件的数据
+const color = ref<string>("rgba(255, 69, 0, 0.68)");
+const predefineColors = reactive([
+    "#ff4500",
+    "#ff8c00",
+    "#ffd700",
+    "#90ee90",
+    "#00ced1",
+    "#1e90ff",
+    "#c71585",
+    "rgba(255, 69, 0, 0.68)",
+    "rgb(255, 120, 0)",
+    "hsv(51, 100, 98)",
+    "hsva(120, 40, 94, 0.5)",
+    "hsl(181, 100%, 37%)",
+    "hsla(209, 100%, 56%, 0.73)",
+    "#c7158577"
+]);
+//开关组件是否打开
+let dark = ref<boolean>(false);
 
 //切换全屏模式
 const fullScreen = () => {
@@ -70,6 +107,20 @@ const logout = async () => {
     await userStore.userLogout();
     $router.replace({path: '/login', query: {redirect: $route.path}});
 }
+
+//switch开关的chang事件进行暗黑模式的切换
+const changeDark = () => {
+    let html = document.documentElement;//获取HTML根节点
+    //判断HTML标签是否有类名dark
+    dark.value ? html.className = "dark" : html.className = "";
+};
+
+//主题颜色的设置
+const setPrimaryColor = () => {
+    //通知js修改根节点的样式对象的属性与属性值
+    const html = document.documentElement;
+    html.style.setProperty("--el-color-primary", color.value);
+};
 </script>
 
 <style scoped lang="scss">
