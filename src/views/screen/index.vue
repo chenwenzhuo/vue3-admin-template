@@ -89,7 +89,7 @@ window.onresize = () => screenRef.value.style.transform = `scale(${getScale()}) 
       }
 
       .bottom-center {
-        flex: 2;
+        flex: 1.5;
       }
     }
   }
