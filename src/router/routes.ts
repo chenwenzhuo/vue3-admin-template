@@ -30,9 +30,9 @@ export const routesConfig = [{
             icon: 'HomeFilled'
         }
     }, {
-        path: '/screen',
-        component: import((`@/views/screen/index.vue`)),
-        name: 'screen',
+        path: '/screenTransfer',
+        name: 'screenTransfer',
+        redirect: '/screen',
         meta: {
             title: '数据大屏',
             hidden: false,
@@ -124,6 +124,10 @@ export const routesConfig = [{
             }
         },]
     }]
+}, {
+    path: '/screen',
+    component: import((`@/views/screen/index.vue`)),
+    name: 'screen'
 }, {
     path: '/404',
     component: () => import((`@/views/404/index.vue`)),
