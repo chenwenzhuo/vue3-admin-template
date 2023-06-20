@@ -6,7 +6,11 @@
                 <ScreenTop/>
             </div>
             <div class="bottom">
-                <div class="bottom-left">底部左侧</div>
+                <div class="bottom-left">
+                    <Tourist class="tourist"/>
+                    <Gender class="gender"/>
+                    <Age class="age"/>
+                </div>
                 <div class="bottom-center">底部中间</div>
                 <div class="bottom-right">底部右侧</div>
             </div>
@@ -17,6 +21,9 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
 import ScreenTop from "@/views/screen/ScreenTop.vue";
+import Tourist from "@/views/screen/Tourist.vue";
+import Gender from "@/views/screen/Gender.vue";
+import Age from "@/views/screen/Age.vue";
 
 const screenRef = ref();//数据大屏容器盒子的DOM元素引用
 
@@ -64,6 +71,17 @@ window.onresize = () => screenRef.value.style.transform = `scale(${getScale()}) 
 
       .bottom-left {
         flex: 1;
+        height: 1040px;
+        display: flex;
+        flex-direction: column;
+
+        .tourist {
+          flex: 1.2;
+        }
+
+        .gender, .age {
+          flex: 1;
+        }
       }
 
       .bottom-right {
