@@ -23,9 +23,7 @@ let timer: any = null;
 let $router = useRouter();//获取路由器对象
 
 //按钮的点击回调
-const goHome = () => {
-    $router.push("/home");
-};
+const goHome = () => $router.push("/home");
 
 //设置定时器更新时间
 onMounted(() => timer = setInterval(
