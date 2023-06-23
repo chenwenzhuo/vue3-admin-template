@@ -11,7 +11,10 @@
                     <Gender class="gender"/>
                     <Age class="age"/>
                 </div>
-                <div class="bottom-center">底部中间</div>
+                <div class="bottom-center">
+                    <Map class="map"/>
+                    <LineChart class="line-chart"/>
+                </div>
                 <div class="bottom-right">底部右侧</div>
             </div>
         </div>
@@ -24,6 +27,8 @@ import ScreenTop from "@/views/screen/ScreenTop.vue";
 import Tourist from "@/views/screen/Tourist.vue";
 import Gender from "@/views/screen/Gender.vue";
 import Age from "@/views/screen/Age.vue";
+import Map from "@/views/screen/map/Map.vue";
+import LineChart from "@/views/screen/LineChart.vue";
 
 const screenRef = ref();//数据大屏容器盒子的DOM元素引用
 
@@ -90,6 +95,16 @@ window.onresize = () => screenRef.value.style.transform = `scale(${getScale()}) 
 
       .bottom-center {
         flex: 1.5;
+        display: flex;
+        flex-direction: column;
+
+        .map {
+          flex: 4;
+        }
+
+        .line-chart {
+          flex: 1;
+        }
       }
     }
   }
