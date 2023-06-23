@@ -99,7 +99,7 @@ window.onresize = () => screenRef.value.style.transform = `scale(${getScale()}) 
         flex-direction: column;
 
         .map {
-          flex: 4;
+          flex: 3;
         }
 
         .line-chart {
