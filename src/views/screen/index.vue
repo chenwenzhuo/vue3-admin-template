@@ -15,7 +15,11 @@
                     <Map class="map"/>
                     <LineChart class="line-chart"/>
                 </div>
-                <div class="bottom-right">底部右侧</div>
+                <div class="bottom-right">
+                    <Rank class="rank"/>
+                    <AnnualTourist class="annual-tourist"/>
+                    <ConsumeStatistic class="consume-statistic"/>
+                </div>
             </div>
         </div>
     </div>
@@ -29,6 +33,9 @@ import Gender from "@/views/screen/Gender.vue";
 import Age from "@/views/screen/Age.vue";
 import Map from "@/views/screen/map/Map.vue";
 import LineChart from "@/views/screen/LineChart.vue";
+import Rank from "@/views/screen/Rank.vue";
+import AnnualTourist from "@/views/screen/AnnualTourist.vue";
+import ConsumeStatistic from "@/views/screen/ConsumeStatistic.vue";
 
 const screenRef = ref();//数据大屏容器盒子的DOM元素引用
 
@@ -91,12 +98,24 @@ window.onresize = () => screenRef.value.style.transform = `scale(${getScale()}) 
 
       .bottom-right {
         flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .rank {
+          flex: 1.2;
+        }
+
+        .annual-tourist,
+        .consume-statistic {
+          flex: 1;
+        }
       }
 
       .bottom-center {
         flex: 1.5;
         display: flex;
         flex-direction: column;
+        margin: 0 20px;
 
         .map {
           flex: 3;
