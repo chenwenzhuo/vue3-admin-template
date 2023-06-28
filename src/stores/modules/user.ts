@@ -1,10 +1,13 @@
 import {reactive} from 'vue'
 import {defineStore} from 'pinia'
+// @ts-ignore
+import cloneDeep from 'lodash/cloneDeep';
 
 import {reqLogin, reqUserInfo, reqLogout} from "@/api/user";
 import type {loginFormData, loginResponseData, userInfoResponseData} from "@/api/user/types";
 import type {UserState} from "@/stores/modules/types";
-import {routesConfig} from "@/router/routes";
+import {anyRoute, asyncRoute, routesConfig} from "@/router/routes";
+import router from '@/router';
 
 //用户相关二级仓库
 export const useUserStore = defineStore('User', () => {
@@ -38,6 +41,14 @@ export const useUserStore = defineStore('User', () => {
         if (result.code === 200) {
             userState.username = result.data.name;
             userState.avatar = result.data.avatar;
+            //筛选当前用户可访问的异步路由。需要修改asyncRoute对象，所以传入其深拷贝
+            const userAsyncRoute = filterAsyncRoutes(cloneDeep(asyncRoute), result.data.routes);
+            userState.menuRoutes[1].children.push(...userAsyncRoute);
+            //将异步路由注册到路由器中（添加为admin的子路由）
+            userAsyncRoute.forEach(item => router.addRoute('admin', item));
+            //将任意路由也作为动态路由添加，否则在异步路由界面进行刷新时会重定向到404界面
+            //因为路由匹配发生在动态路由挂载前，此时异步路由路径不存在，所以会重定向到404界面
+            router.addRoute(anyRoute);
             return 'ok';
         } else {
             //返回一个失败的Promise
@@ -58,6 +69,20 @@ export const useUserStore = defineStore('User', () => {
         } else {
             return Promise.reject(new Error(result.message));
         }
+    }
+
+    //筛选异步路由
+    function filterAsyncRoutes(asyncRoute: any[], routes: any[]) {
+        return asyncRoute.filter(item => {
+            //当前异步路由item在可访问的路由列表中，返回true，否则返回false
+            if (routes.includes(item.name)) {
+                //当前路由有子路由，递归筛选
+                if (!!item.children && item.children.length > 0)
+                    item.children = filterAsyncRoutes(item.children, routes);
+                return true;
+            }
+            return false;
+        });
     }
 
     return {userState, userLogin, userInfo, userLogout}
