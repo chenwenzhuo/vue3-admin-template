@@ -15,7 +15,8 @@ export const useUserStore = defineStore('User', () => {
         token: localStorage.getItem('TOKEN'),//用户唯一标识token
         menuRoutes: routesConfig,
         username: '',
-        avatar: ''
+        avatar: '',
+        buttons:[],
     });
 
     async function userLogin(data: loginFormData) {
@@ -41,6 +42,7 @@ export const useUserStore = defineStore('User', () => {
         if (result.code === 200) {
             userState.username = result.data.name;
             userState.avatar = result.data.avatar;
+            userState.buttons = result.data.buttons;
             //筛选当前用户可访问的异步路由。需要修改asyncRoute对象，所以传入其深拷贝
             const userAsyncRoute = filterAsyncRoutes(cloneDeep(asyncRoute), result.data.routes);
             userState.menuRoutes[1].children.push(...userAsyncRoute);

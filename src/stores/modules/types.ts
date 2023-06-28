@@ -4,4 +4,5 @@ export interface UserState {
     menuRoutes: any[],
     username: string,
     avatar: string,
+    buttons: any[]
 }
