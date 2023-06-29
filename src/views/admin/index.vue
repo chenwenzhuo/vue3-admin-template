@@ -4,7 +4,7 @@
             <Logo/>
             <el-scrollbar class="aside-scroll-bar">
                 <el-menu background-color="#001529" text-color="#ffffff" active-text-color="yellowgreen"
-                         :default-active="$route.path">
+                         :default-active="$route.path" :unique-opened="true">
                     <Menu :menuList="userStore.userState.menuRoutes[1].children"/>
                 </el-menu>
             </el-scrollbar>

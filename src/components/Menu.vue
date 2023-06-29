@@ -15,7 +15,7 @@
         </template>
         <!--有子路由-->
         <template v-if="item.children">
-            <el-sub-menu index="item.path" v-if="!item.meta.hidden">
+            <el-sub-menu :index="item.path" v-if="!item.meta.hidden">
                 <!--子菜单标题-->
                 <template #title>
                     <el-icon>
